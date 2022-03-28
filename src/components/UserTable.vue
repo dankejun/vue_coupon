@@ -4,22 +4,22 @@
     <el-header>
       <el-form size="small" :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item label="用户ID">
-          <el-input style="width: 120px" v-model="formInline.user" placeholder="用户ID"></el-input>
+          <el-input style="width: 200px" v-model="formInline.user" placeholder="用户ID"></el-input>
         </el-form-item>
 
         <el-form-item label="用户昵称">
-          <el-input style="width: 90px" v-model="formInline.user" placeholder="用户昵称"></el-input>
+          <el-input style="width: 200px" v-model="formInline.user" placeholder="用户昵称"></el-input>
         </el-form-item>
 
         <el-form-item label="是否兑换耗材">
-          <el-select style="width: 60px" v-model="formInline.region" placeholder="是否兑换耗材">
+          <el-select style="width: 100px" v-model="formInline.region" placeholder="是否兑换耗材">
             <el-option label="是" value="shanghai"></el-option>
             <el-option label="否" value="beijing"></el-option>
           </el-select>
         </el-form-item>
 
         <el-form-item label="上次兑换商品名称">
-          <el-input style="width: 150px" v-model="formInline.user" placeholder="上次兑换商品名称"></el-input>
+          <el-input style="width: 200px" v-model="formInline.user" placeholder="上次兑换商品名称"></el-input>
         </el-form-item>
         <el-form-item label="登陆时间">
 <!--          <el-input style="width: 155px" v-model="formInline.user" placeholder="登陆时间"></el-input>-->
@@ -28,7 +28,7 @@
               v-model="value1"
               type="date"
               placeholder="选择日期"
-              style="width: 130px">
+              style="width: 200px">
             </el-date-picker>
           </div>
         </el-form-item>
@@ -41,7 +41,7 @@
         </div>
       </el-form>
     </el-header>
-    <!--主题表格-->
+    <!--主体表格-->
     <el-main>
       <el-row>
         <el-button type="primary" size="small">限制参与活动</el-button>
@@ -115,19 +115,47 @@
           align="center"
           prop="userDetails"
           label="详情">
+          <el-button type="text" size="small" @click="drawer = true">查看详情</el-button>
         </el-table-column>
       </el-table>
       <!-- 分页组件 -->
       <el-pagination
           background
+          :page-size="3"
+          :pager-count="5"
           layout="prev, pager, next"
-          page-size="3"
-          pager-count="4"
-          :total="30"
+          :total="15">
           prev-text="上一页"
           next-text="下一页">
         </el-pagination>
     </el-main>
+    <el-drawer
+      title="用户详情"
+      :visible.sync="drawer"
+      direction="ltr"
+      :withHeader=false>
+      <el-descriptions class="margin-top" title="用户详情" :column="2" direction="horizontal">
+        <el-descriptions-item label="用户昵称" :span="1">{{userDetails.userName}}</el-descriptions-item>
+        <el-descriptions-item label="用户状态" :span="2">{{userDetails.status}}</el-descriptions-item>
+        <el-descriptions-item label="用户ID" :span="2">{{ userDetails.userId }}</el-descriptions-item>
+        <el-descriptions-item label="拥有水滴" :span="1">{{ userDetails.dripCount }}</el-descriptions-item>
+        <el-descriptions-item label="今日获取水滴" :span="2">{{ userDetails.todayDripCount }}</el-descriptions-item>
+        <el-descriptions-item label="最近登陆时间" :span="1">{{userDetails.lastLoginTime}}</el-descriptions-item>
+          <el-table
+            :data="exchangeInfo"
+            border
+            style="width: 100%">
+            <el-table-column
+              prop="exchangeTime"
+              label="兑换时间">
+            </el-table-column>
+            <el-table-column
+              prop="exchangeName"
+              label="兑换商品">
+            </el-table-column>
+          </el-table>
+      </el-descriptions>
+    </el-drawer>
   </el-container>
 </template>
 
@@ -136,6 +164,7 @@ export default {
   name: 'UserTable',
   data() {
     return {
+      drawer: false,
       tableData: [
         {
         userName: '周杰伦',
@@ -187,7 +216,21 @@ export default {
         user: '',
         region: ''
       },
-      value1:''
+      value1: '',
+      userDetails: {
+        userName: '周杰伦',
+        status: '正常',
+        userId: '00001',
+        dripCount: 8999,
+        todayDripCount: 500,
+        lastLoginTime: '2022-01-12'
+      },
+      exchangeInfo:
+        [
+          {
+            exchangeTime: '2022-3-28',
+            exchangeName: '小天鹅3kg洗衣机-25元优惠券'}
+        ]
     }
   },
   methods: {
@@ -210,9 +253,12 @@ export default {
   text-align: center;
 }
 .el-row{
-  margin-bottom: 10px;
+  margin-bottom: 30px;
 }
 .el-header,.el-main{
   margin-top: 50px;
+}
+.el-descriptions{
+  margin: 30px 0 0 20px;
 }
 </style>
