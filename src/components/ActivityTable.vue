@@ -8,8 +8,8 @@
       </el-row>
       <!--用户表格-->
       <el-table
-        ref="multipleTable"
-        :data="tableData"
+        ref="activityList"
+        :data="activityList"
         stripe
         border
         style="width: 100%;font-size: x-small"
@@ -44,36 +44,30 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "ActivityTable",
   data() {
-    return {
-      tableData: [
-        {
-          activityName: '洗衣攒水滴',
-          beginTime: '2022-04-01',
-          endTime: "待定",
-          status: '上架'
-        },
-        {
-          activityName: '洗衣攒水滴',
-          beginTime: '2022-04-01',
-          endTime: "待定",
-          status: '上架'
-        },
-        {
-          activityName: '洗衣攒水滴',
-          beginTime: '2022-04-01',
-          endTime: "待定",
-          status: '上架'
-        }
-      ],
-      multipleSelection: [],
-      formInline: {
-        user: '',
-        region: ''
-      }
+    const activity = {
+      activityName: '洗衣攒水滴',
+      beginTime: '2022-04-01',
+      endTime: "待定",
+      status: '上架'
     }
+    return {
+      // activityList: Array(5).fill(activity),
+      activityList: [],
+      multipleSelection: []
+    }
+  },
+  mounted() {
+    axios
+      .get( '/getActivity')
+      .then(response => (this.activityList = response.data))
+      .catch(function (error) { // 请求失败处理
+        console.log(error);
+      });
   },
   methods:{
     handleSelectionChange(val) {

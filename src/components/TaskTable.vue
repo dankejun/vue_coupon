@@ -2,7 +2,7 @@
   <el-container>
     <el-main style="margin-top: 100px">
       <el-table
-        :data="tableData"
+        :data="taskList"
         stripe
         border
         style="width: 100%;">
@@ -40,18 +40,28 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
-    const item = {
+    const task = {
       id: "0001",
       name: '使用任意程序',
       count: 100,
-      frequency:'每日一次',
-      description:'启动并完成程序'
+      frequency: '每日一次',
+      description: '启动并完成程序'
     };
     return {
-      tableData: Array(5).fill(item)
+      taskList: Array(5).fill(task)
     }
+  },
+  mounted() {
+    axios
+      .get("/getTask")
+      .then(response => (this.taskList = response.data))
+      .catch(function (error) { // 请求失败处理
+        console.log(error);
+      });
   }
 }
 </script>

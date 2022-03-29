@@ -2,30 +2,29 @@
   <el-container>
     <!--头部搜索-->
     <el-header>
-      <el-form size="small" :inline="true" :model="formInline" class="demo-form-inline">
+      <el-form size="small" :inline="true" :model="searchUserList" class="demo-form-inline">
         <el-form-item label="用户ID">
-          <el-input style="width: 200px" v-model="formInline.user" placeholder="用户ID"></el-input>
+          <el-input style="width: 200px" v-model="searchUserList.userId" placeholder="用户ID"></el-input>
         </el-form-item>
 
         <el-form-item label="用户昵称">
-          <el-input style="width: 200px" v-model="formInline.user" placeholder="用户昵称"></el-input>
+          <el-input style="width: 200px" v-model="searchUserList.userName" placeholder="用户昵称"></el-input>
         </el-form-item>
 
         <el-form-item label="是否兑换耗材">
-          <el-select style="width: 100px" v-model="formInline.region" placeholder="是否兑换耗材">
+          <el-select style="width: 100px" v-model="searchUserList.exchangeFlag" placeholder="是否兑换耗材">
             <el-option label="是" value="shanghai"></el-option>
             <el-option label="否" value="beijing"></el-option>
           </el-select>
         </el-form-item>
 
         <el-form-item label="上次兑换商品名称">
-          <el-input style="width: 200px" v-model="formInline.user" placeholder="上次兑换商品名称"></el-input>
+          <el-input style="width: 200px" v-model="searchUserList.lastExchangeName" placeholder="上次兑换商品名称"></el-input>
         </el-form-item>
         <el-form-item label="登陆时间">
-<!--          <el-input style="width: 155px" v-model="formInline.user" placeholder="登陆时间"></el-input>-->
           <div class="block">
             <el-date-picker
-              v-model="value1"
+              v-model="searchUserList.lastLoginTime"
               type="date"
               placeholder="选择日期"
               style="width: 200px">
@@ -36,7 +35,7 @@
         <div style="text-align: center">
           <el-form-item>
             <el-button type="primary" @click="onSubmit">查询</el-button>
-            <el-button >重置</el-button>
+            <el-button @click="resetList">重置</el-button>
           </el-form-item>
         </div>
       </el-form>
@@ -49,8 +48,8 @@
       </el-row>
       <!--用户表格-->
       <el-table
-        ref="multipleTable"
-        :data="tableData"
+        ref="userList"
+        :data="userList"
         stripe
         border
         style="width: 100%;font-size: x-small"
@@ -84,6 +83,7 @@
         <el-table-column
           align="center"
           prop="yesDripCount"
+          sortable
           label="昨天获取水滴">
         </el-table-column>
         <el-table-column
@@ -142,9 +142,9 @@
         <el-descriptions-item label="今日获取水滴" :span="2">{{ userDetails.todayDripCount }}</el-descriptions-item>
         <el-descriptions-item label="最近登陆时间" :span="1">{{userDetails.lastLoginTime}}</el-descriptions-item>
           <el-table
-            :data="exchangeInfo"
+            :data="userDetails.exchangeInfo"
             border
-            style="width: 100%">
+            style="width: 90%;margin-left: 5%">
             <el-table-column
               prop="exchangeTime"
               label="兑换时间">
@@ -160,78 +160,57 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: 'UserTable',
   data() {
+    const userInfo = {
+      userName: '周杰伦',
+      userId: '0001',
+      dripCount: 8999,
+      yesDripCount: 500,
+      exchangeFlag: '是',
+      lastExchangeName: '小天鹅除菌洗衣液3kg',
+      lastExchangeDate: '2021-11-29',
+      userStatus: '正常',
+      lastLoginDate: '2021-11-29'
+    };
     return {
       drawer: false,
-      tableData: [
-        {
-        userName: '周杰伦',
-        userId: '0001',
-        dripCount: 8999,
-        yesDripCount: 500,
-        exchangeFlag: '是',
-        lastExchangeName: '小天鹅除菌洗衣液3kg',
-        lastExchangeDate: '2021-11-29',
-        userStatus: '正常',
-        lastLoginDate: '2021-11-29'
+      userList: Array(5).fill(userInfo),
+      searchUserList: {
+        userId: '',
+        userName: '',
+        exchangeFlag:'',
+        lastExchangeName: '',
+        lastLoginTime: ''
       },
-        {
-          userName: '周杰伦',
-          userId: '0001',
-          dripCount: 8999,
-          yesDripCount: 500,
-          exchangeFlag: '是',
-          lastExchangeName: '小天鹅除菌洗衣液3kg',
-          lastExchangeDate: '2021-11-29',
-          userStatus: '正常',
-          lastLoginDate: '2021-11-29'
-        },
-        {
-          userName: '周杰伦',
-          userId: '0001',
-          dripCount: 8999,
-          yesDripCount: 500,
-          exchangeFlag: '是',
-          lastExchangeName: '小天鹅除菌洗衣液3kg',
-          lastExchangeDate: '2021-11-29',
-          userStatus: '正常',
-          lastLoginDate: '2021-11-29'
-        },
-        {
-          userName: '周杰伦',
-          userId: '0001',
-          dripCount: 8999,
-          yesDripCount: 500,
-          exchangeFlag: '是',
-          lastExchangeName: '小天鹅除菌洗衣液3kg',
-          lastExchangeDate: '2021-11-29',
-          userStatus: '正常',
-          lastLoginDate: '2021-11-29'
-        }
-      ],
-      multipleSelection: [],
-      formInline: {
-        user: '',
-        region: ''
-      },
-      value1: '',
       userDetails: {
         userName: '周杰伦',
         status: '正常',
         userId: '00001',
         dripCount: 8999,
         todayDripCount: 500,
-        lastLoginTime: '2022-01-12'
+        lastLoginTime: '2022-01-12',
+        exchangeInfo:
+          [
+            {
+              exchangeTime: '2022-3-28',
+              exchangeName: '小天鹅3kg洗衣机-25元优惠券'
+            }
+          ]
       },
-      exchangeInfo:
-        [
-          {
-            exchangeTime: '2022-3-28',
-            exchangeName: '小天鹅3kg洗衣机-25元优惠券'}
-        ]
+      multipleSelection: []
     }
+  },
+  mounted() {
+    axios
+      .get("/getUser")
+      .then(response => this.userList = response.data)
+      .catch(function (error) {
+        console.log(error)
+      });
   },
   methods: {
     indexMethod(index) {
@@ -242,7 +221,10 @@ export default {
     },
     onSubmit() {
       console.log('submit!');
-    }
+    },
+    resetList() {
+      this.searchUserList={}
+    },
   }
 }
 </script>

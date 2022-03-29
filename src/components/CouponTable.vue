@@ -10,8 +10,8 @@
       </el-row>
       <!--用户表格-->
       <el-table
-        ref="multipleTable"
-        :data="tableData"
+        ref="couponList"
+        :data="couponList"
         stripe
         border
         style="width: 100%;font-size: x-small"
@@ -61,62 +61,40 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "CouponTable",
   data() {
+    const couponInfo = {
+      couponName: '小天鹅除菌洗衣液3kg',
+      productImg: '',
+      productLink: "https://www.hao123.com",
+      sort: 0,
+      status: '上架'
+    }
     return {
-      tableData: [
-        {
-          couponName: '小天鹅除菌洗衣液3kg',
-          productImg: '',
-          productLink: "https://www.hao123.com",
-          sort: 0,
-          status: '上架'
-        },
-        {
-          couponName: '小天鹅除菌洗衣液3kg',
-          productImg: '',
-          productLink: "https://www.hao123.com",
-          sort: 0,
-          status: '上架'
-        },
-        {
-          couponName: '小天鹅除菌洗衣液3kg',
-          productImg: '',
-          productLink: "https://www.hao123.com",
-          sort: 0,
-          status: '上架'
-        },          {
-          couponName: '小天鹅除菌洗衣液3kg',
-          productImg: '',
-          productLink: "https://www.hao123.com",
-          sort: 0,
-          status: '上架'
-        },
-        {
-          couponName: '小天鹅除菌洗衣液3kg',
-          productImg: '',
-          productLink: "https://www.hao123.com",
-          sort: 0,
-          status: '上架'
-        }
-      ],
-      multipleSelection: [],
-      formInline: {
-        user: '',
-        region: ''
-      }
+      couponList: Array(5).fill(couponInfo),
+      multipleSelection: []
     }
   },
-  methods:{
+  mounted() {
+    axios
+      .get("/getCoupon")
+      .then(response => this.couponList = response.data)
+      .catch(function (error) {
+        console.log(error)
+      });
+  },
+  methods: {
     handleSelectionChange(val) {
       this.multipleSelection = val
     },
-    toAddCoupon () {
+    toAddCoupon() {
       this.$router.push('/addCoupon')
     }
   }
-}
+};
 </script>
 
 <style scoped>
