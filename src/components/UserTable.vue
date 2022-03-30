@@ -160,8 +160,7 @@
 </template>
 
 <script>
-import axios from "axios";
-
+import {getUserList} from "../api/userRequest";
 export default {
   name: 'UserTable',
   data() {

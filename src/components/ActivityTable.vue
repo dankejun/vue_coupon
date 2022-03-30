@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import {getActivityList} from "../api/activityRequest";
 
 export default {
   name: "ActivityTable",
@@ -56,18 +56,13 @@ export default {
       status: '上架'
     }
     return {
-      // activityList: Array(5).fill(activity),
-      activityList: [],
+      activityList: Array(5).fill(activity),
+      // activityList: [],
       multipleSelection: []
     }
   },
   mounted() {
-    axios
-      .get( '/getActivity')
-      .then(response => (this.activityList = response.data))
-      .catch(function (error) { // 请求失败处理
-        console.log(error);
-      });
+    getActivityList().then(response => (this.activityList = response.data))
   },
   methods:{
     handleSelectionChange(val) {

@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import {getTaskList} from "../api/taskRequest";
 
 export default {
   data() {
@@ -56,12 +56,7 @@ export default {
     }
   },
   mounted() {
-    axios
-      .get("/getTask")
-      .then(response => (this.taskList = response.data))
-      .catch(function (error) { // 请求失败处理
-        console.log(error);
-      });
+    getTaskList().then(response => (this.taskList = response.data))
   }
 }
 </script>

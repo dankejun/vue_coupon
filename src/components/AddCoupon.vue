@@ -12,7 +12,8 @@
             action="#"
             list-type="picture-card"
             :auto-upload="false"
-            limit=1>
+            :limit=1
+            :on-exceed="handleExceed">
             <i slot="default" class="el-icon-plus"></i>
             <div slot="file" slot-scope="{file}">
             <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
@@ -36,13 +37,47 @@
               </span>
             </span>
             </div>
+            <div class="el-upload__tip" slot="tip" style="color: darkgray">图片格式：png、jpg、jpeg，图片大小不超过5M</div>
           </el-upload>
           <el-dialog :visible.sync="dialogVisible">
             <img width="100%" :src="dialogImageUrl" alt="">
           </el-dialog>
         </el-form-item>
         <el-form-item label="详情图" prop="productBigImg">
-          <el-input v-model="productForm.productBigImg" style="width: 20%"></el-input>
+          <el-upload
+            action="#"
+            list-type="picture-card"
+            :auto-upload="false"
+            :limit=1
+            :on-exceed="handleExceed">
+            <i slot="default" class="el-icon-plus"></i>
+            <div slot="file" slot-scope="{file}">
+              <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
+              <span class="el-upload-list__item-actions">
+              <span
+                class="el-upload-list__item-preview"
+                @click="handlePictureCardPreview(file)">
+                <i class="el-icon-zoom-in"></i>
+              </span>
+              <span
+                v-if="!disabled"
+                class="el-upload-list__item-delete"
+                @click="handleDownload(file)">
+                <i class="el-icon-download"></i>
+              </span>
+              <span
+                v-if="!disabled"
+                class="el-upload-list__item-delete"
+                @click="handleRemove(file)">
+                <i class="el-icon-delete"></i>
+              </span>
+            </span>
+            </div>
+            <div class="el-upload__tip" slot="tip" style="color: darkgray">图片格式：png、jpg、jpeg，图片大小不超过5M</div>
+          </el-upload>
+          <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
         </el-form-item>
         <el-form-item label="所属商品ID" prop="productId">
           <el-input v-model="productForm.productId" style="width: 50%"></el-input>
@@ -185,6 +220,13 @@ export default {
     },
     handleDownload(file) {
       console.log(file);
+    },
+    handleExceed() {
+      this.$message({
+        showClose: true,
+        message: '只能添加一张图片',
+        type: 'warning'
+      });
     }
   }
 }

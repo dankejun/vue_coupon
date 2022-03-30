@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import {getCouponList} from "../api/couponRequest";
 
 export default {
   name: "CouponTable",
@@ -79,12 +79,7 @@ export default {
     }
   },
   mounted() {
-    axios
-      .get("/getCoupon")
-      .then(response => this.couponList = response.data)
-      .catch(function (error) {
-        console.log(error)
-      });
+    getCouponList().then(resonse => (this.couponList = resonse));
   },
   methods: {
     handleSelectionChange(val) {
