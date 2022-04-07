@@ -8,7 +8,7 @@ export const Request = axios.create({
   baseURL: ConfigBaseURL,
   // method: 'post',
   headers: {
-    'Content-Type': 'application/json;charset=UTF-8'
+    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
   }
 })
 // 添加请求拦截器

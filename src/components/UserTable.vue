@@ -204,12 +204,7 @@ export default {
     }
   },
   mounted() {
-    axios
-      .get("/getUser")
-      .then(response => this.userList = response.data)
-      .catch(function (error) {
-        console.log(error)
-      });
+    getUserList().then(response => (this.taskList = response.data))
   },
   methods: {
     indexMethod(index) {

@@ -8,30 +8,30 @@
         style="width: 100%;">
         <el-table-column
           align="center"
-          prop="id"
+          prop="idTaskInfo"
           label="任务Id"
           width="180"
         >
         </el-table-column>
         <el-table-column
           align="center"
-          prop="name"
+          prop="taskName"
           label="任务名称"
           width="180">
         </el-table-column>
         <el-table-column
           align="center"
-          prop="count"
+          prop="rewardDripCount"
           label="奖励水滴数量">
         </el-table-column>
         <el-table-column
           align="center"
-          prop="frequency"
+          prop="taskFrequency"
           label="频率">
         </el-table-column>
         <el-table-column
           align="center"
-          prop="description"
+          prop="taskDescription"
           label="任务说明">
         </el-table-column>
       </el-table>
@@ -44,19 +44,12 @@ import {getTaskList} from "../api/taskRequest";
 
 export default {
   data() {
-    const task = {
-      id: "0001",
-      name: '使用任意程序',
-      count: 100,
-      frequency: '每日一次',
-      description: '启动并完成程序'
-    };
     return {
-      taskList: Array(5).fill(task)
+      taskList: []
     }
   },
   mounted() {
-    getTaskList().then(response => (this.taskList = response.data))
+    getTaskList().then(response => (this.taskList = response.data.data))
   }
 }
 </script>

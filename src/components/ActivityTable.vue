@@ -3,8 +3,8 @@
     <!--主体表格-->
     <el-main>
       <el-row>
-        <el-button size="small">上架</el-button>
-        <el-button size="small">下架</el-button>
+        <el-button size="small" @click="updateStatus(true)">上架</el-button>
+        <el-button size="small" @click="updateStatus(false)">下架</el-button>
       </el-row>
       <!--用户表格-->
       <el-table
@@ -35,7 +35,7 @@
         </el-table-column>
         <el-table-column
           align="center"
-          prop="status"
+          prop="activityStatus"
           label="上下架状态">
         </el-table-column>
       </el-table>
@@ -44,29 +44,39 @@
 </template>
 
 <script>
-import {getActivityList} from "../api/activityRequest";
+import {getActivityList, updateActivityStatus} from "../api/activityRequest";
 
 export default {
   name: "ActivityTable",
+  inject: ["reload"],
   data() {
-    const activity = {
-      activityName: '洗衣攒水滴',
-      beginTime: '2022-04-01',
-      endTime: "待定",
-      status: '上架'
-    }
     return {
-      activityList: Array(5).fill(activity),
-      // activityList: [],
+      activityList: [],
       multipleSelection: []
     }
   },
   mounted() {
-    getActivityList().then(response => (this.activityList = response.data))
+    getActivityList().then(response => {
+      for (let activity of response.data.data) {
+        if (activity.activityStatus === 1) {
+          activity.activityStatus = "上架";
+        } else {
+          activity.activityStatus = "下架";
+        }
+      }
+      this.activityList = response.data.data;
+    });
   },
-  methods:{
+  methods: {
     handleSelectionChange(val) {
       this.multipleSelection = val
+    },
+    updateStatus(status) {
+      for (let selection of this.multipleSelection) {
+        let id = selection.idActivityInfo
+        updateActivityStatus(id, status);
+      }
+      location.reload()
     }
   }
 }
