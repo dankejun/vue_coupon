@@ -22,28 +22,32 @@
         </el-table-column>
         <el-table-column
           align="center"
-          prop="couponName"
+          prop="productName"
           label="优惠券名称">
         </el-table-column>
         <el-table-column
           align="center"
-          prop="productImg"
+          prop="smallProductImg"
           label="图片">
         </el-table-column>
         <el-table-column
           align="center"
-          prop="productLink"
-          label="商品链接">
+          prop="idMallItem"
+          label="商品商城ID">
         </el-table-column>
         <el-table-column
           align="center"
-          prop="sort"
+          prop="productOrder"
           label="排序">
         </el-table-column>
         <el-table-column
           align="center"
-          prop="status"
+          prop="productStatus"
           label="上下架状态">
+          <template slot-scope="scope">
+　　　　　　　　　　<span v-if="scope.row.productStatus===1">上架</span>
+　　　　　　　　　　<span v-if="scope.row.productStatus===0">下架</span>
+          </template>
         </el-table-column>
       </el-table>
       <!-- 分页组件 -->
@@ -66,20 +70,15 @@ import {getCouponList} from "../api/couponRequest";
 export default {
   name: "CouponTable",
   data() {
-    const couponInfo = {
-      couponName: '小天鹅除菌洗衣液3kg',
-      productImg: '',
-      productLink: "https://www.hao123.com",
-      sort: 0,
-      status: '上架'
-    }
     return {
-      couponList: Array(5).fill(couponInfo),
+      couponList: [],
       multipleSelection: []
     }
   },
   mounted() {
-    getCouponList().then(resonse => (this.couponList = resonse));
+    getCouponList().then(response => {
+      this.couponList = response.data.data;
+    });
   },
   methods: {
     handleSelectionChange(val) {

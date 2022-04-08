@@ -37,6 +37,10 @@
           align="center"
           prop="activityStatus"
           label="上下架状态">
+          <template slot-scope="scope">
+　　　　　　　　　　<span v-if="scope.row.activityStatus===1">上架</span>
+　　　　　　　　　　<span v-if="scope.row.activityStatus===0">下架</span>
+          </template>
         </el-table-column>
       </el-table>
     </el-main>
@@ -48,7 +52,6 @@ import {getActivityList, updateActivityStatus} from "../api/activityRequest";
 
 export default {
   name: "ActivityTable",
-  inject: ["reload"],
   data() {
     return {
       activityList: [],
@@ -57,13 +60,6 @@ export default {
   },
   mounted() {
     getActivityList().then(response => {
-      for (let activity of response.data.data) {
-        if (activity.activityStatus === 1) {
-          activity.activityStatus = "上架";
-        } else {
-          activity.activityStatus = "下架";
-        }
-      }
       this.activityList = response.data.data;
     });
   },
@@ -73,7 +69,10 @@ export default {
     },
     updateStatus(status) {
       for (let selection of this.multipleSelection) {
-        let id = selection.idActivityInfo
+        if (selection.activityStatus === '上架') {
+
+        }
+        let id = selection.idActivityInfo;
         updateActivityStatus(id, status);
       }
       location.reload()
@@ -83,17 +82,20 @@ export default {
 </script>
 
 <style scoped>
-.el-pagination{
+.el-pagination {
   margin-top: 40px;
   text-align: center;
 }
-.el-row{
+
+.el-row {
   margin-bottom: 30px;
 }
-.el-header,.el-main{
+
+.el-header, .el-main {
   margin-top: 50px;
 }
-.el-button{
+
+.el-button {
   width: 100px;
 }
 </style>

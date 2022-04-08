@@ -72,50 +72,65 @@
         </el-table-column>
         <el-table-column
           align="center"
-          prop="userId"
+          prop="idUserInfo"
           label="用户ID">
         </el-table-column>
         <el-table-column
           align="center"
           prop="dripCount"
+          sortable
           label="拥有水滴">
         </el-table-column>
+<!--        <el-table-column-->
+<!--          align="center"-->
+<!--          prop="yestDripCount"-->
+<!--          sortable-->
+<!--          label="昨天获取水滴">-->
+<!--        </el-table-column>-->
         <el-table-column
           align="center"
-          prop="yesDripCount"
-          sortable
-          label="昨天获取水滴">
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="exchangeFlag"
+          prop="exchangedFlag"
           label="是否兑换耗材">
         </el-table-column>
+<!--        <el-table-column-->
+<!--          align="center"-->
+<!--          prop="lastExchangeName"-->
+<!--          label="上次兑换商品名称">-->
+<!--          <template slot-scope="scope">-->
+<!--　　　　　　　　　　<span v-if="scope.row.lastExchangeName===null">—</span>-->
+<!--　　　　　　　　　　<span v-else>{{ scope.row.lastExchangeName }}</span>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
+<!--        <el-table-column-->
+<!--          align="center"-->
+<!--          prop="lastExchangeTime"-->
+<!--          label="上次兑换商品时间">-->
+<!--          <template slot-scope="scope">-->
+<!--　　　　　　　　　　<span v-if="scope.row.lastExchangeTime===null">—</span>-->
+<!--                <span v-else>{{ scope.row.lastExchangeTime }}</span>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
         <el-table-column
           align="center"
-          prop="lastExchangeName"
-          label="上次兑换商品名称">
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="lastExchangeDate"
-          label="上次兑换商品时间">
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="userStatus"
+          prop="status"
           label="用户账号状态">
+          <template slot-scope="scope">
+　　　　　　　　　　<span v-if="scope.row.status===1">正常</span>
+　　　　　　　　　　<span v-if="scope.row.status===0">限制</span>
+          </template>
         </el-table-column>
         <el-table-column
           align="center"
-          prop="lastLoginDate"
+          prop="lastVisitTime"
           label="最近登陆时间">
         </el-table-column>
         <el-table-column
           align="center"
           prop="userDetails"
           label="详情">
-          <el-button type="text" size="small" @click="drawer = true">查看详情</el-button>
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="queryUserInfoById(scope.row)">查看详情</el-button>
+          </template>
         </el-table-column>
       </el-table>
       <!-- 分页组件 -->
@@ -136,48 +151,38 @@
       :withHeader=false>
       <el-descriptions class="margin-top" title="用户详情" :column="2" direction="horizontal">
         <el-descriptions-item label="用户昵称" :span="1">{{userDetails.userName}}</el-descriptions-item>
-        <el-descriptions-item label="用户状态" :span="2">{{userDetails.status}}</el-descriptions-item>
-        <el-descriptions-item label="用户ID" :span="2">{{ userDetails.userId }}</el-descriptions-item>
+        <el-descriptions-item label="用户状态" :span="2">
+        </el-descriptions-item>
+        <el-descriptions-item label="用户ID" :span="2">{{ userDetails.idUserInfo }}</el-descriptions-item>
         <el-descriptions-item label="拥有水滴" :span="1">{{ userDetails.dripCount }}</el-descriptions-item>
         <el-descriptions-item label="今日获取水滴" :span="2">{{ userDetails.todayDripCount }}</el-descriptions-item>
-        <el-descriptions-item label="最近登陆时间" :span="1">{{userDetails.lastLoginTime}}</el-descriptions-item>
-          <el-table
-            :data="userDetails.exchangeInfo"
-            border
-            style="width: 90%;margin-left: 5%">
-            <el-table-column
-              prop="exchangeTime"
-              label="兑换时间">
-            </el-table-column>
-            <el-table-column
-              prop="exchangeName"
-              label="兑换商品">
-            </el-table-column>
-          </el-table>
+        <el-descriptions-item label="最近登陆时间" :span="1">{{userDetails.lastVisitTime}}</el-descriptions-item>
       </el-descriptions>
+      <el-table
+        :data="userDetails.exchangeList"
+        border
+        style="width: 90%;margin-left: 5%">
+        <el-table-column
+          prop="exchangeTime"
+          label="兑换时间">
+        </el-table-column>
+        <el-table-column
+          prop="productName+couponName"
+          label="兑换商品">
+        </el-table-column>
+      </el-table>
     </el-drawer>
   </el-container>
 </template>
 
 <script>
-import {getUserList} from "../api/userRequest";
+import {getUserList, queryUserDetailsById} from "../api/userRequest";
 export default {
   name: 'UserTable',
   data() {
-    const userInfo = {
-      userName: '周杰伦',
-      userId: '0001',
-      dripCount: 8999,
-      yesDripCount: 500,
-      exchangeFlag: '是',
-      lastExchangeName: '小天鹅除菌洗衣液3kg',
-      lastExchangeDate: '2021-11-29',
-      userStatus: '正常',
-      lastLoginDate: '2021-11-29'
-    };
     return {
       drawer: false,
-      userList: Array(5).fill(userInfo),
+      userList: [],
       searchUserList: {
         userId: '',
         userName: '',
@@ -185,26 +190,12 @@ export default {
         lastExchangeName: '',
         lastLoginTime: ''
       },
-      userDetails: {
-        userName: '周杰伦',
-        status: '正常',
-        userId: '00001',
-        dripCount: 8999,
-        todayDripCount: 500,
-        lastLoginTime: '2022-01-12',
-        exchangeInfo:
-          [
-            {
-              exchangeTime: '2022-3-28',
-              exchangeName: '小天鹅3kg洗衣机-25元优惠券'
-            }
-          ]
-      },
+      userDetails: {},
       multipleSelection: []
     }
   },
   mounted() {
-    getUserList().then(response => (this.taskList = response.data))
+    getUserList().then(response => (this.userList = response.data.data))
   },
   methods: {
     indexMethod(index) {
@@ -219,6 +210,10 @@ export default {
     resetList() {
       this.searchUserList={}
     },
+    queryUserInfoById(row) {
+      this.drawer = true;
+      queryUserDetailsById(row.idUserInfo).then(response => (this.userDetails = response.data.data))
+    }
   }
 }
 </script>
