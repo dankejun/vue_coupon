@@ -15,3 +15,13 @@ export function queryUserDetailsById(idActivityInfo) {
     }
   })
 }
+export function updateUserStatus(userList) {
+  return Request({
+    url: '/v1/updateUserStatus',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data:{userList}
+  })
+}

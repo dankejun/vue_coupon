@@ -69,9 +69,6 @@ export default {
     },
     updateStatus(status) {
       for (let selection of this.multipleSelection) {
-        if (selection.activityStatus === '上架') {
-
-        }
         let id = selection.idActivityInfo;
         updateActivityStatus(id, status);
       }

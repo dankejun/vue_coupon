@@ -43,8 +43,8 @@
     <!--主体表格-->
     <el-main>
       <el-row>
-        <el-button type="primary" size="small">限制参与活动</el-button>
-        <el-button size="small">解除限制</el-button>
+        <el-button type="primary" size="small" @click="updateStatus(true)">限制参与活动</el-button>
+        <el-button size="small" @click="updateStatus(false)">解除限制</el-button>
       </el-row>
       <!--用户表格-->
       <el-table
@@ -91,6 +91,10 @@
           align="center"
           prop="exchangedFlag"
           label="是否兑换耗材">
+          <template slot-scope="scope">
+　　　　　　　　　　<span v-if="scope.row.exchangedFlag===1">是</span>
+　　　　　　　　　　<span v-if="scope.row.exchangedFlag===0">否</span>
+          </template>
         </el-table-column>
 <!--        <el-table-column-->
 <!--          align="center"-->
@@ -148,11 +152,11 @@
       title="用户详情"
       :visible.sync="drawer"
       direction="ltr"
+      size="40%"
       :withHeader=false>
       <el-descriptions class="margin-top" title="用户详情" :column="2" direction="horizontal">
         <el-descriptions-item label="用户昵称" :span="1">{{userDetails.userName}}</el-descriptions-item>
-        <el-descriptions-item label="用户状态" :span="2">
-        </el-descriptions-item>
+        <el-descriptions-item label="用户状态" :span="2">{{userDetails.status === 1?'正常':'限制'}}</el-descriptions-item>
         <el-descriptions-item label="用户ID" :span="2">{{ userDetails.idUserInfo }}</el-descriptions-item>
         <el-descriptions-item label="拥有水滴" :span="1">{{ userDetails.dripCount }}</el-descriptions-item>
         <el-descriptions-item label="今日获取水滴" :span="2">{{ userDetails.todayDripCount }}</el-descriptions-item>
@@ -167,8 +171,14 @@
           label="兑换时间">
         </el-table-column>
         <el-table-column
-          prop="productName+couponName"
+          prop="productName,couponName,requiredDrip,smallProductImg"
           label="兑换商品">
+          <template slot-scope="scope">
+            <img :src="scope.row.smallProductImg"/>
+            {{scope.row.productName}}-{{scope.row.couponName}}
+            <br>
+            <span style="color:#d67440">{{scope.row.requiredDrip}}</span>
+          </template>
         </el-table-column>
       </el-table>
     </el-drawer>
@@ -176,7 +186,8 @@
 </template>
 
 <script>
-import {getUserList, queryUserDetailsById} from "../api/userRequest";
+import {getUserList, queryUserDetailsById, updateUserStatus} from "../api/userRequest";
+import {updateActivityStatus} from "../api/activityRequest";
 export default {
   name: 'UserTable',
   data() {
@@ -213,7 +224,17 @@ export default {
     queryUserInfoById(row) {
       this.drawer = true;
       queryUserDetailsById(row.idUserInfo).then(response => (this.userDetails = response.data.data))
+    },
+  updateStatus(status) {
+    let userList = [];
+    for (let selection of this.multipleSelection) {
+      if (selection.status !== status) {
+        userList.push(selection);
+      }
     }
+    updateUserStatus(userList);
+    // location.reload()
+  }
   }
 }
 </script>
