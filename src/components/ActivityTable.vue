@@ -3,8 +3,8 @@
     <!--主体表格-->
     <el-main>
       <el-row>
-        <el-button size="small" @click="updateStatus(true)">上架</el-button>
-        <el-button size="small" @click="updateStatus(false)">下架</el-button>
+        <el-button size="small" @click="updateStatus(1)">上架</el-button>
+        <el-button size="small" @click="updateStatus(0)">下架</el-button>
       </el-row>
       <!--用户表格-->
       <el-table
@@ -69,10 +69,15 @@ export default {
     },
     updateStatus(status) {
       for (let selection of this.multipleSelection) {
-        let id = selection.idActivityInfo;
-        updateActivityStatus(id, status);
+        if (selection.activityStatus !== status) {
+          selection.activityStatus = status
+          let id = selection.idActivityInfo;
+          updateActivityStatus(id, status).then(response => {
+            // this.$refs.activityList.clearSelection();
+            location.reload()
+          });
+        }
       }
-      location.reload()
     }
   }
 }

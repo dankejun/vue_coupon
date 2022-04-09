@@ -6,3 +6,13 @@ export function getCouponList () {
     method: 'post'
   })
 }
+export function updateProductStatus(productList) {
+  return Request({
+    url: '/v1/updateProductStatus',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data:productList
+  })
+}

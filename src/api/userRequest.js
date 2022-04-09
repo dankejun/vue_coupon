@@ -22,6 +22,16 @@ export function updateUserStatus(userList) {
     headers: {
       'Content-Type': 'application/json'
     },
-    data:{userList}
+    data:userList
+  })
+}
+export function searchUserList(searchRequest) {
+  return Request({
+    url: '/v1/searchUserList',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data:searchRequest
   })
 }

@@ -4,9 +4,9 @@
     <el-main>
       <el-row>
         <el-button type="primary" size="small" @click="toAddCoupon">新增优惠券</el-button>
-        <el-button size="small">修改优惠券</el-button>
-        <el-button size="small">上架</el-button>
-        <el-button size="small">下架</el-button>
+        <el-button size="small" @click="toAddCoupon">修改优惠券</el-button>
+        <el-button size="small" @click="updateStatus(1)">上架</el-button>
+        <el-button size="small" @click="updateStatus(0)">下架</el-button>
       </el-row>
       <!--用户表格-->
       <el-table
@@ -29,6 +29,14 @@
           align="center"
           prop="smallProductImg"
           label="图片">
+          <template slot-scope="scope">
+            <el-image style="width: 70px; height: 40px" :src="scope.row.smallProductImg"
+                      :preview-src-list="[scope.row.smallProductImg]">
+              <div slot="error" class="image-slot">
+                <i class="el-icon-picture-outline"></i>
+              </div>
+            </el-image>
+          </template>
         </el-table-column>
         <el-table-column
           align="center"
@@ -65,7 +73,7 @@
 </template>
 
 <script>
-import {getCouponList} from "../api/couponRequest";
+import {getCouponList, updateProductStatus} from "../api/couponRequest";
 
 export default {
   name: "CouponTable",
@@ -86,6 +94,23 @@ export default {
     },
     toAddCoupon() {
       this.$router.push('/addCoupon')
+    },
+    updateStatus(status) {
+      let userList = [];
+      for (let selection of this.multipleSelection) {
+        if (selection.productStatus !== status) {
+          selection.productStatus = status;
+          userList.push(selection);
+        }
+      }
+      if (userList.length !== 0) {
+        updateProductStatus(userList).then(response => {
+          if (response.data === true) {
+            // this.$refs.couponList.clearSelection()
+            location.reload()
+          }
+        });
+      }
     }
   }
 };

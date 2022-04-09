@@ -2,31 +2,32 @@
   <el-container>
     <!--头部搜索-->
     <el-header>
-      <el-form size="small" :inline="true" :model="searchUserList" class="demo-form-inline">
+      <el-form size="small" :inline="true" :model="searchRequest" style="text-align: center" class="demo-form-inline">
         <el-form-item label="用户ID">
-          <el-input style="width: 200px" v-model="searchUserList.userId" placeholder="用户ID"></el-input>
+          <el-input style="width: 200px" v-model="searchRequest.idUserInfo" placeholder="用户ID"></el-input>
         </el-form-item>
 
         <el-form-item label="用户昵称">
-          <el-input style="width: 200px" v-model="searchUserList.userName" placeholder="用户昵称"></el-input>
+          <el-input style="width: 200px" v-model="searchRequest.userName" placeholder="用户昵称"></el-input>
         </el-form-item>
 
         <el-form-item label="是否兑换耗材">
-          <el-select style="width: 100px" v-model="searchUserList.exchangeFlag" placeholder="是否兑换耗材">
-            <el-option label="是" value="shanghai"></el-option>
-            <el-option label="否" value="beijing"></el-option>
+          <el-select style="width: 100px" v-model="searchRequest.exchangedFlag" placeholder="是否兑换耗材">
+            <el-option label="是" value=1></el-option>
+            <el-option label="否" value=0></el-option>
           </el-select>
         </el-form-item>
 
         <el-form-item label="上次兑换商品名称">
-          <el-input style="width: 200px" v-model="searchUserList.lastExchangeName" placeholder="上次兑换商品名称"></el-input>
+          <el-input disabled style="width: 200px" v-model="searchRequest.lastExchangeName" placeholder="上次兑换商品名称"></el-input>
         </el-form-item>
         <el-form-item label="登陆时间">
           <div class="block">
             <el-date-picker
-              v-model="searchUserList.lastLoginTime"
+              v-model="searchRequest.lastVisitTime"
               type="date"
               placeholder="选择日期"
+              value-format="yyyy-MM-dd"
               style="width: 200px">
             </el-date-picker>
           </div>
@@ -34,7 +35,7 @@
         <br>
         <div style="text-align: center">
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">查询</el-button>
+            <el-button type="primary" @click="searchUserList">查询</el-button>
             <el-button @click="resetList">重置</el-button>
           </el-form-item>
         </div>
@@ -43,8 +44,8 @@
     <!--主体表格-->
     <el-main>
       <el-row>
-        <el-button type="primary" size="small" @click="updateStatus(true)">限制参与活动</el-button>
-        <el-button size="small" @click="updateStatus(false)">解除限制</el-button>
+        <el-button type="primary" size="small" @click="updateStatus(0)">限制参与活动</el-button>
+        <el-button size="small" @click="updateStatus(1)">解除限制</el-button>
       </el-row>
       <!--用户表格-->
       <el-table
@@ -81,46 +82,46 @@
           sortable
           label="拥有水滴">
         </el-table-column>
-<!--        <el-table-column-->
-<!--          align="center"-->
-<!--          prop="yestDripCount"-->
-<!--          sortable-->
-<!--          label="昨天获取水滴">-->
-<!--        </el-table-column>-->
+        <!--        <el-table-column-->
+        <!--          align="center"-->
+        <!--          prop="yestDripCount"-->
+        <!--          sortable-->
+        <!--          label="昨天获取水滴">-->
+        <!--        </el-table-column>-->
         <el-table-column
           align="center"
           prop="exchangedFlag"
           label="是否兑换耗材">
           <template slot-scope="scope">
-　　　　　　　　　　<span v-if="scope.row.exchangedFlag===1">是</span>
-　　　　　　　　　　<span v-if="scope.row.exchangedFlag===0">否</span>
+            　　　　　　　　　　<span v-if="scope.row.exchangedFlag===1">是</span>
+            　　　　　　　　　　<span v-if="scope.row.exchangedFlag===0">否</span>
           </template>
         </el-table-column>
-<!--        <el-table-column-->
-<!--          align="center"-->
-<!--          prop="lastExchangeName"-->
-<!--          label="上次兑换商品名称">-->
-<!--          <template slot-scope="scope">-->
-<!--　　　　　　　　　　<span v-if="scope.row.lastExchangeName===null">—</span>-->
-<!--　　　　　　　　　　<span v-else>{{ scope.row.lastExchangeName }}</span>-->
-<!--          </template>-->
-<!--        </el-table-column>-->
-<!--        <el-table-column-->
-<!--          align="center"-->
-<!--          prop="lastExchangeTime"-->
-<!--          label="上次兑换商品时间">-->
-<!--          <template slot-scope="scope">-->
-<!--　　　　　　　　　　<span v-if="scope.row.lastExchangeTime===null">—</span>-->
-<!--                <span v-else>{{ scope.row.lastExchangeTime }}</span>-->
-<!--          </template>-->
-<!--        </el-table-column>-->
+        <!--        <el-table-column-->
+        <!--          align="center"-->
+        <!--          prop="lastExchangeName"-->
+        <!--          label="上次兑换商品名称">-->
+        <!--          <template slot-scope="scope">-->
+        <!--　　　　　　　　　　<span v-if="scope.row.lastExchangeName===null">—</span>-->
+        <!--　　　　　　　　　　<span v-else>{{ scope.row.lastExchangeName }}</span>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
+        <!--        <el-table-column-->
+        <!--          align="center"-->
+        <!--          prop="lastExchangeTime"-->
+        <!--          label="上次兑换商品时间">-->
+        <!--          <template slot-scope="scope">-->
+        <!--　　　　　　　　　　<span v-if="scope.row.lastExchangeTime===null">—</span>-->
+        <!--                <span v-else>{{ scope.row.lastExchangeTime }}</span>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
         <el-table-column
           align="center"
           prop="status"
           label="用户账号状态">
           <template slot-scope="scope">
-　　　　　　　　　　<span v-if="scope.row.status===1">正常</span>
-　　　　　　　　　　<span v-if="scope.row.status===0">限制</span>
+            　　　　　　　　　　<span v-if="scope.row.status===1">正常</span>
+            　　　　　　　　　　<span v-if="scope.row.status===0">限制</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -139,28 +140,28 @@
       </el-table>
       <!-- 分页组件 -->
       <el-pagination
-          background
-          :page-size="3"
-          :pager-count="5"
-          layout="prev, pager, next"
-          :total="15">
-          prev-text="上一页"
-          next-text="下一页">
-        </el-pagination>
+        background
+        :page-size="3"
+        :pager-count="5"
+        layout="prev, pager, next"
+        :total="15">
+        prev-text="上一页"
+        next-text="下一页">
+      </el-pagination>
     </el-main>
     <el-drawer
       title="用户详情"
       :visible.sync="drawer"
       direction="ltr"
-      size="40%"
+      size="45%"
       :withHeader=false>
       <el-descriptions class="margin-top" title="用户详情" :column="2" direction="horizontal">
-        <el-descriptions-item label="用户昵称" :span="1">{{userDetails.userName}}</el-descriptions-item>
-        <el-descriptions-item label="用户状态" :span="2">{{userDetails.status === 1?'正常':'限制'}}</el-descriptions-item>
+        <el-descriptions-item label="用户昵称" :span="1">{{ userDetails.userName }}</el-descriptions-item>
+        <el-descriptions-item label="用户状态" :span="2">{{ userDetails.status === 1 ? '正常' : '限制' }}</el-descriptions-item>
         <el-descriptions-item label="用户ID" :span="2">{{ userDetails.idUserInfo }}</el-descriptions-item>
         <el-descriptions-item label="拥有水滴" :span="1">{{ userDetails.dripCount }}</el-descriptions-item>
         <el-descriptions-item label="今日获取水滴" :span="2">{{ userDetails.todayDripCount }}</el-descriptions-item>
-        <el-descriptions-item label="最近登陆时间" :span="1">{{userDetails.lastVisitTime}}</el-descriptions-item>
+        <el-descriptions-item label="最近登陆时间" :span="1">{{ userDetails.lastVisitTime }}</el-descriptions-item>
       </el-descriptions>
       <el-table
         :data="userDetails.exchangeList"
@@ -174,10 +175,14 @@
           prop="productName,couponName,requiredDrip,smallProductImg"
           label="兑换商品">
           <template slot-scope="scope">
-            <img :src="scope.row.smallProductImg"/>
-            {{scope.row.productName}}-{{scope.row.couponName}}
-            <br>
-            <span style="color:#d67440">{{scope.row.requiredDrip}}</span>
+            <el-image style="width: 60px; height: 40px" :src="scope.row.smallProductImg"
+                      :preview-src-list="[scope.row.smallProductImg]">
+              <div slot="error" class="image-slot">
+                <i class="el-icon-picture-outline"></i>
+              </div>
+            </el-image>
+            <span>{{ scope.row.productName }}-{{ scope.row.couponName }}<br></span>
+            <span style="color:#d67440;">{{ scope.row.requiredDrip }}水滴</span>
           </template>
         </el-table-column>
       </el-table>
@@ -186,21 +191,15 @@
 </template>
 
 <script>
-import {getUserList, queryUserDetailsById, updateUserStatus} from "../api/userRequest";
-import {updateActivityStatus} from "../api/activityRequest";
+import {getUserList, queryUserDetailsById, searchUserList, updateUserStatus} from "../api/userRequest";
+
 export default {
   name: 'UserTable',
   data() {
     return {
       drawer: false,
       userList: [],
-      searchUserList: {
-        userId: '',
-        userName: '',
-        exchangeFlag:'',
-        lastExchangeName: '',
-        lastLoginTime: ''
-      },
+      searchRequest: {},
       userDetails: {},
       multipleSelection: []
     }
@@ -210,47 +209,64 @@ export default {
   },
   methods: {
     indexMethod(index) {
-      return index+1;
+      return index + 1;
     },
-    handleSelectionChange (val) {
+    handleSelectionChange(val) {
       this.multipleSelection = val
     },
     onSubmit() {
       console.log('submit!');
     },
     resetList() {
-      this.searchUserList={}
+      this.searchRequest = {}
     },
     queryUserInfoById(row) {
       this.drawer = true;
       queryUserDetailsById(row.idUserInfo).then(response => (this.userDetails = response.data.data))
     },
-  updateStatus(status) {
-    let userList = [];
-    for (let selection of this.multipleSelection) {
-      if (selection.status !== status) {
-        userList.push(selection);
+    updateStatus(status) {
+      let userList = [];
+      for (let selection of this.multipleSelection) {
+        if (selection.status !== status) {
+          selection.status = status;
+          userList.push(selection);
+        }
+      }
+      if (userList.length !== 0) {
+        updateUserStatus(userList).then(response => {
+          if (response.data === true) {
+            // this.$refs.userList.clearSelection()
+            location.reload()
+          }
+        });
+      }
+    },
+    searchUserList() {
+      if (this.searchRequest != null) {
+        searchUserList(this.searchRequest).then(response =>{
+          this.userList = response.data.data;
+        });
       }
     }
-    updateUserStatus(userList);
-    // location.reload()
-  }
   }
 }
 </script>
 
 <style scoped>
-.el-pagination{
+.el-pagination {
   margin-top: 40px;
   text-align: center;
 }
-.el-row{
+
+.el-row {
   margin-bottom: 30px;
 }
-.el-header,.el-main{
+
+.el-header, .el-main {
   margin-top: 50px;
 }
-.el-descriptions{
+
+.el-descriptions {
   margin: 30px 0 0 20px;
 }
 </style>

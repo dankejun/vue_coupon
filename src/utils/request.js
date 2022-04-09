@@ -7,9 +7,9 @@ export const Request = axios.create({
   timeout: 7000, // 请求超时时间
   baseURL: ConfigBaseURL,
   // method: 'post',
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-  }
+  // headers: {
+  //   'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+  // }
 })
 // 添加请求拦截器
 Request.interceptors.request.use(function (config) {
