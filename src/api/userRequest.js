@@ -35,3 +35,26 @@ export function searchUserList(searchRequest) {
     data:searchRequest
   })
 }
+
+export function queryUserInPage(pageIndex, pageSize) {
+  return Request({
+    url: '/v1/queryUserInPage',
+    method: 'post',
+    params: {
+      pageIndex: pageIndex,
+      pageSize: pageSize
+    }
+  })
+}
+
+export function queryUserDetailsInPage(idActivityInfo, pageIndex, pageSize) {
+  return Request({
+    url: '/v1/queryUserInfoByIdInPage',
+    method: 'post',
+    params: {
+      idUserInfo: idActivityInfo,
+      pageIndex: pageIndex,
+      pageSize: pageSize
+    }
+  })
+}

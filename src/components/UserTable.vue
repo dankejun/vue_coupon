@@ -134,17 +134,22 @@
           prop="userDetails"
           label="详情">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="queryUserInfoById(scope.row)">查看详情</el-button>
+            <el-button type="text" size="small" @click="queryUserInfoByIdInPage(scope.row)">查看详情</el-button>
           </template>
         </el-table-column>
       </el-table>
       <!-- 分页组件 -->
       <el-pagination
         background
-        :page-size="3"
-        :pager-count="5"
         layout="prev, pager, next"
-        :total="15">
+        :page-size=pageSize
+        :pager-count="5"
+        :total=total
+        :page-count=pages
+        :current-page.sync=pageIndex
+        @current-change="getUserListPage(pageIndex)"
+        @next-click="getUserListPage(pageIndex + 1)"
+        @prev-click="getUserListPage(pageIndex - 1)"
         prev-text="上一页"
         next-text="下一页">
       </el-pagination>
@@ -186,26 +191,61 @@
           </template>
         </el-table-column>
       </el-table>
+      <!-- 分页组件 -->
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :page-size=pageSize
+          :pager-count="5"
+          :total=total
+          :page-count=pages
+          :current-page.sync=pageIndex
+          @current-change="getUserDetailsPage(pageIndex)"
+          @next-click="getUserDetailsPage(pageIndex + 1)"
+          @prev-click="getUserDetailsPage(pageIndex - 1)"
+          prev-text="上一页"
+          next-text="下一页">
+        </el-pagination>
     </el-drawer>
   </el-container>
 </template>
 
 <script>
-import {getUserList, queryUserDetailsById, searchUserList, updateUserStatus} from "../api/userRequest";
+import {
+  queryUserDetailsById, queryUserDetailsInPage,
+  queryUserInPage,
+  searchUserList,
+  updateUserStatus
+} from "../api/userRequest";
 
 export default {
   name: 'UserTable',
   data() {
+    let page;
+    let pageSize;
+    let pages;
+    let total;
     return {
       drawer: false,
       userList: [],
       searchRequest: {},
       userDetails: {},
-      multipleSelection: []
+      multipleSelection: [],
+      pageIndex: page,
+      pageSize: pageSize,
+      pages: pages,
+      total: total
     }
   },
   mounted() {
-    getUserList().then(response => (this.userList = response.data.data))
+    queryUserInPage().then(response => {
+      let responseData = response.data.data
+      this.userList = responseData.userList;
+      this.total = responseData.total;
+      this.pages = responseData.pages;
+      this.pageIndex = responseData.pageIndex;
+      this.pageSize = responseData.pageSize;
+    });
   },
   methods: {
     indexMethod(index) {
@@ -223,6 +263,17 @@ export default {
     queryUserInfoById(row) {
       this.drawer = true;
       queryUserDetailsById(row.idUserInfo).then(response => (this.userDetails = response.data.data))
+    },
+    queryUserInfoByIdInPage(row) {
+      this.drawer = true;
+      queryUserDetailsInPage(row.idUserInfo).then(response =>{
+        let responseData = response.data.data
+        this.userDetails = responseData;
+        this.total = responseData.total;
+        this.pages = responseData.pages;
+        this.pageIndex = responseData.pageIndex;
+        this.pageSize = responseData.pageSize;
+      })
     },
     updateStatus(status) {
       let userList = [];
@@ -247,6 +298,26 @@ export default {
           this.userList = response.data.data;
         });
       }
+    },
+    getUserListPage(pageIndex) {
+      queryUserInPage(pageIndex).then(response => {
+        let responseData = response.data.data
+        this.userList = responseData.userList;
+        this.total = responseData.total;
+        this.pages = responseData.pages;
+        this.pageIndex = responseData.pageIndex;
+        this.pageSize = responseData.pageSize;
+      });
+    },
+    getUserDetailsPage(pageIndex) {
+      queryUserDetailsInPage(this.userDetails.idUserInfo, pageIndex).then(response => {
+        let responseData = response.data.data
+        this.userDetails = responseData;
+        this.total = responseData.total;
+        this.pages = responseData.pages;
+        this.pageIndex = responseData.pageIndex;
+        this.pageSize = responseData.pageSize;
+      });
     }
   }
 }

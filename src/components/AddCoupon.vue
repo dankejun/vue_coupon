@@ -80,7 +80,7 @@
           </el-dialog>
         </el-form-item>
         <el-form-item label="所属商品ID" prop="productId">
-          <el-input v-model="productForm.productId" style="width: 50%"></el-input>
+          <el-input v-model="productForm.productId" @change="queryCoupon" style="width: 50%"></el-input>
         </el-form-item>
         <el-form-item label="商品原价" prop="price">
           <el-input v-model.number="productForm.price" style="width: 10%"></el-input>
@@ -93,13 +93,16 @@
             size="mini"
             style="width: 50%">
             <el-table-column
-              prop="denomination"
+              prop="couponDenomination"
               label="优惠券面额"
               width="180">
+              <template slot-scope="scope">
+                {{scope.row.couponDenomination}}元优惠券
+              </template>
             </el-table-column>
             <el-table-column
-              prop="couponId"
-              label="优惠券ID"
+              prop="idMallObtain"
+              label="优惠券领取ID"
               width="180">
             </el-table-column>
             <el-table-column
@@ -107,7 +110,7 @@
               label="所需水滴">
             </el-table-column>
             <el-table-column
-              prop="couponCount"
+              prop="couponStock"
               label="优惠券数量">
             </el-table-column>
             <!--            <el-table-column-->
@@ -143,15 +146,11 @@
 </template>
 
 <script>
+import {queryCouponListByMId} from "../api/couponRequest";
+
 export default {
   name: "AddCoupon",
   data() {
-    const coupon = {
-      denomination: '10元优惠券',
-      couponId: 'xxxx',
-      requiredDrip: 1000,
-      couponCount: 100
-    }
     return {
       productForm: {
         productName: '',
@@ -159,7 +158,7 @@ export default {
         productBigImg: '',
         productId: '',
         price: '',
-        couponList: Array(3).fill(coupon),
+        couponList: [],
         sort: 0,
         description: '',
         status: ''
@@ -227,6 +226,9 @@ export default {
         message: '只能添加一张图片',
         type: 'warning'
       });
+    },
+    queryCoupon() {
+      queryCouponListByMId(this.productForm.productId).then(response => (this.productForm.couponList = response.data.data))
     }
   }
 }

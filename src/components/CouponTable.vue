@@ -53,8 +53,8 @@
           prop="productStatus"
           label="上下架状态">
           <template slot-scope="scope">
-　　　　　　　　　　<span v-if="scope.row.productStatus===1">上架</span>
-　　　　　　　　　　<span v-if="scope.row.productStatus===0">下架</span>
+            　　　　　　　　　　<span v-if="scope.row.productStatus===1">上架</span>
+            　　　　　　　　　　<span v-if="scope.row.productStatus===0">下架</span>
           </template>
         </el-table-column>
       </el-table>
@@ -62,9 +62,14 @@
       <el-pagination
         background
         layout="prev, pager, next"
-        :page-size="3"
+        :page-size=pageSize
         :pager-count="5"
-        :total="30"
+        :total=total
+        :page-count=pages
+        :current-page.sync=pageIndex
+        @next-click="getPage(pageIndex + 1)"
+        @prev-click="getPage(pageIndex - 1)"
+        @current-change="getPage(pageIndex)"
         prev-text="上一页"
         next-text="下一页">
       </el-pagination>
@@ -73,19 +78,32 @@
 </template>
 
 <script>
-import {getCouponList, updateProductStatus} from "../api/couponRequest";
+import {queryProductInPage, updateProductStatus} from "../api/productRequest";
 
 export default {
   name: "CouponTable",
   data() {
+    let page;
+    let pageSize;
+    let pages;
+    let total;
     return {
       couponList: [],
-      multipleSelection: []
-    }
+      multipleSelection: [],
+      pageIndex: page,
+      pageSize: pageSize,
+      pages: pages,
+      total: total
+    };
   },
   mounted() {
-    getCouponList().then(response => {
-      this.couponList = response.data.data;
+    queryProductInPage().then(response => {
+      let responseData = response.data.data
+      this.couponList = responseData.productList;
+      this.total = responseData.total;
+      this.pages = responseData.pages;
+      this.pageIndex = responseData.pageIndex;
+      this.pageSize = responseData.pageSize;
     });
   },
   methods: {
@@ -111,20 +129,32 @@ export default {
           }
         });
       }
+    },
+    getPage(pageIndex) {
+      queryProductInPage(pageIndex).then(response => {
+        let responseData = response.data.data
+        this.couponList = responseData.productList;
+        this.total = responseData.total;
+        this.pages = responseData.pages;
+        this.pageIndex = responseData.pageIndex;
+        this.pageSize = responseData.pageSize;
+      });
     }
   }
 };
 </script>
 
 <style scoped>
-.el-pagination{
+.el-pagination {
   margin-top: 40px;
   text-align: center;
 }
-.el-row{
+
+.el-row {
   margin-bottom: 30px;
 }
-.el-header,.el-main{
+
+.el-header, .el-main {
   margin-top: 50px;
 }
 </style>
