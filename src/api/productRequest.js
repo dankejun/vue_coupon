@@ -27,3 +27,13 @@ export function queryProductInPage(pageIndex, pageSize) {
     }
   })
 }
+export function saveOrUpdateProduct(productAddRequest) {
+  return Request({
+    url: '/v1/saveOrUpdateProduct',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: productAddRequest
+  })
+}

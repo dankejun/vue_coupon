@@ -35,8 +35,13 @@ export default new Router({
       component: ActivityTable
     },
     {
-      path: '/addCoupon',
-      name: 'addCoupon',
+      path: '/updateProduct/:id',
+      name: 'updateProduct',
+      component: AddCoupon
+    },
+    {
+      path: '/addProduct',
+      name: 'addProduct',
       component: AddCoupon
     }
   ]

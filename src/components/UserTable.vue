@@ -142,18 +142,19 @@
       <el-pagination
         background
         layout="prev, pager, next"
-        :page-size=pageSize
+        :page-size=userListPage.pageSize
         :pager-count="5"
-        :total=total
-        :page-count=pages
-        :current-page.sync=pageIndex
-        @current-change="getUserListPage(pageIndex)"
-        @next-click="getUserListPage(pageIndex + 1)"
-        @prev-click="getUserListPage(pageIndex - 1)"
+        :total=userListPage.total
+        :page-count=userListPage.pages
+        :current-page.sync=userListPage.pageIndex
+        @current-change="getUserListPage(userListPage.pageIndex)"
+        @next-click="getUserListPage(userListPage.pageIndex + 1)"
+        @prev-click="getUserListPage(userListPage.pageIndex - 1)"
         prev-text="上一页"
         next-text="下一页">
       </el-pagination>
     </el-main>
+      <!--用户详情-->
     <el-drawer
       title="用户详情"
       :visible.sync="drawer"
@@ -192,17 +193,17 @@
         </el-table-column>
       </el-table>
       <!-- 分页组件 -->
-        <el-pagination
+      <el-pagination
           background
           layout="prev, pager, next"
-          :page-size=pageSize
+          :page-size=userDetailsPage.pageSize
           :pager-count="5"
-          :total=total
-          :page-count=pages
-          :current-page.sync=pageIndex
-          @current-change="getUserDetailsPage(pageIndex)"
-          @next-click="getUserDetailsPage(pageIndex + 1)"
-          @prev-click="getUserDetailsPage(pageIndex - 1)"
+          :total=userDetailsPage.total
+          :page-count=userDetailsPage.pages
+          :current-page.sync=userDetailsPage.pageIndex
+          @current-change="getUserDetailsPage(userDetailsPage.pageIndex)"
+          @next-click="getUserDetailsPage(userDetailsPage.pageIndex + 1)"
+          @prev-click="getUserDetailsPage(userDetailsPage.pageIndex - 1)"
           prev-text="上一页"
           next-text="下一页">
         </el-pagination>
@@ -221,31 +222,29 @@ import {
 export default {
   name: 'UserTable',
   data() {
-    let page;
-    let pageSize;
-    let pages;
-    let total;
     return {
       drawer: false,
       userList: [],
       searchRequest: {},
       userDetails: {},
       multipleSelection: [],
-      pageIndex: page,
-      pageSize: pageSize,
-      pages: pages,
-      total: total
-    }
+      userListPage: {
+        pageIndex: 0,
+        pageSize: 0,
+        pages: 0,
+        total: 0
+      },
+      userDetailsPage: {
+        pageIndex: 0,
+        pageSize: 0,
+        pages: 0,
+        total: 0
+      }
+
+    };
   },
   mounted() {
-    queryUserInPage().then(response => {
-      let responseData = response.data.data
-      this.userList = responseData.userList;
-      this.total = responseData.total;
-      this.pages = responseData.pages;
-      this.pageIndex = responseData.pageIndex;
-      this.pageSize = responseData.pageSize;
-    });
+    this.getUserListPage();
   },
   methods: {
     indexMethod(index) {
@@ -266,14 +265,8 @@ export default {
     },
     queryUserInfoByIdInPage(row) {
       this.drawer = true;
-      queryUserDetailsInPage(row.idUserInfo).then(response =>{
-        let responseData = response.data.data
-        this.userDetails = responseData;
-        this.total = responseData.total;
-        this.pages = responseData.pages;
-        this.pageIndex = responseData.pageIndex;
-        this.pageSize = responseData.pageSize;
-      })
+      this.userDetails.idUserInfo = row.idUserInfo
+      this.getUserDetailsPage()
     },
     updateStatus(status) {
       let userList = [];
@@ -286,7 +279,6 @@ export default {
       if (userList.length !== 0) {
         updateUserStatus(userList).then(response => {
           if (response.data === true) {
-            // this.$refs.userList.clearSelection()
             location.reload()
           }
         });
@@ -303,20 +295,20 @@ export default {
       queryUserInPage(pageIndex).then(response => {
         let responseData = response.data.data
         this.userList = responseData.userList;
-        this.total = responseData.total;
-        this.pages = responseData.pages;
-        this.pageIndex = responseData.pageIndex;
-        this.pageSize = responseData.pageSize;
+        this.userListPage.total = responseData.total;
+        this.userListPage.pages = responseData.pages;
+        this.userListPage.pageIndex = responseData.pageIndex;
+        this.userListPage.pageSize = responseData.pageSize;
       });
     },
     getUserDetailsPage(pageIndex) {
       queryUserDetailsInPage(this.userDetails.idUserInfo, pageIndex).then(response => {
         let responseData = response.data.data
         this.userDetails = responseData;
-        this.total = responseData.total;
-        this.pages = responseData.pages;
-        this.pageIndex = responseData.pageIndex;
-        this.pageSize = responseData.pageSize;
+        this.userDetailsPage.total = responseData.total;
+        this.userDetailsPage.pages = responseData.pages;
+        this.userDetailsPage.pageIndex = responseData.pageIndex;
+        this.userDetailsPage.pageSize = responseData.pageSize;
       });
     }
   }

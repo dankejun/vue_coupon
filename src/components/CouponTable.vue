@@ -3,12 +3,12 @@
     <!--主体表格-->
     <el-main>
       <el-row>
-        <el-button type="primary" size="small" @click="toAddCoupon">新增优惠券</el-button>
-        <el-button size="small" @click="toAddCoupon">修改优惠券</el-button>
+        <el-button type="primary" size="small" @click="toAddCoupon(1)">新增优惠券</el-button>
+        <el-button size="small" @click="toAddCoupon(0)">修改优惠券</el-button>
         <el-button size="small" @click="updateStatus(1)">上架</el-button>
         <el-button size="small" @click="updateStatus(0)">下架</el-button>
       </el-row>
-      <!--用户表格-->
+      <!--商品表格-->
       <el-table
         ref="couponList"
         :data="couponList"
@@ -110,8 +110,23 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val
     },
-    toAddCoupon() {
-      this.$router.push('/addCoupon')
+    toAddCoupon(isAdd) {
+      if (isAdd === 1) {
+        this.$router.push('/addProduct');
+      } else {
+        let id;
+        if (this.multipleSelection[0] != null) {
+          id = this.multipleSelection[0].idProductInfo;
+          this.$router.push({
+            path: `/updateProduct/${id}`
+          });
+        } else {
+          this.$message({
+            showClose: true,
+            message: '请选择要修改的商品'
+          });
+        }
+      }
     },
     updateStatus(status) {
       let userList = [];

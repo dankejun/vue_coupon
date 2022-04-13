@@ -9,3 +9,25 @@ export function queryCouponListByMId (idMallItem) {
     }
   })
 }
+export function queryProductDetailsById (idProductInfo) {
+  return Request({
+    url: '/v1/queryProductDetailsById',
+    method: 'post',
+    params:{
+      idProductInfo: idProductInfo
+    }
+  })
+}
+export function getOssInfo () {
+  return Request({
+    url: '/v1/getOssInfo',
+    method: 'post'
+  })
+}
+export function imgUpload (file) {
+  return Request({
+    url: '/v1/imgUpload',
+    method: 'post',
+    data: file
+  })
+}
