@@ -60,6 +60,7 @@ export default {
       imgUpload(form).then(response => {
         this.path = response.data
         this.$emit('submitBigImg',this.path)
+        console.log("path1---->" + this.path)
       })
     }
   }

@@ -62,6 +62,7 @@ export default {
       imgUpload(form).then(response => {
         this.path = response.data
         this.$emit('submitSmallImg',this.path)
+        console.log("path1---->" + this.path)
       })
     }
   }

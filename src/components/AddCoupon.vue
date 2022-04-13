@@ -13,13 +13,13 @@
           <el-input v-model="productForm.productName" style="width: 20%"></el-input>
         </el-form-item>
         <el-form-item label="缩略图" prop="smallProductImg">
-          <OssUploadImg :smallImg="productForm.smallProductImg" @submitProduct="submitSmallImg" ref="OssUploadImg"></OssUploadImg>
+          <OssUploadImg :smallImg="productForm.smallProductImg" @submitSmallImg="submitSmallImg" ref="OssUploadImg"></OssUploadImg>
           <!--          <el-input v-model="productForm.smallProductImg" style="width: 50%"></el-input>-->
         </el-form-item>
         <el-form-item label="详情图" prop="bigProductImg">
           <!--          <OssUploadImg :ossData="ossData"></OssUploadImg>-->
           <!--          <el-input v-model="productForm.bigProductImg" style="width: 50%"></el-input>-->
-          <OssUploadBigImg :bigProductImg="productForm.bigProductImg" @submitProduct="submitBigImg" ref="OssUploadBigImg"></OssUploadBigImg>
+          <OssUploadBigImg :bigProductImg="productForm.bigProductImg" @submitBigImg="submitBigImg" ref="OssUploadBigImg"></OssUploadBigImg>
         </el-form-item>
         <el-form-item label="所属商品ID" prop="idMallItem">
           <el-input v-model="productForm.idMallItem" @change="queryCoupon" style="width: 50%"></el-input>
@@ -136,6 +136,8 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          console.log("smallProductImg1---->"+ this.productForm.smallProductImg)
+          console.log("BigProductImg1---->"+ this.productForm.BigProductImg)
           saveOrUpdateProduct(this.productForm)
           // this.$refs.OssUploadImg.submitUpload()
           this.retCouponTable()
@@ -147,10 +149,12 @@ export default {
     },
     submitSmallImg(path) {
       this.productForm.smallProductImg = path
+      console.log("smallProductImg2---->"+ this.productForm.smallProductImg)
       // saveOrUpdateProduct(this.productForm)
     },
     submitBigImg(path) {
       this.productForm.BigProductImg = path
+      console.log("BigProductImg2---->"+ this.productForm.BigProductImg)
       // saveOrUpdateProduct(this.productForm)
     },
     retCouponTable() {
