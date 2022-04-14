@@ -31,3 +31,13 @@ export function imgUpload (file) {
     data: file
   })
 }
+export function imgDelete (ImgDeleteRequest) {
+  return Request({
+    url: '/v1/imgDelete',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: ImgDeleteRequest
+  })
+}

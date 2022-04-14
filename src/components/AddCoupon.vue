@@ -12,14 +12,15 @@
         <el-form-item label="优惠券名称" prop="productName">
           <el-input v-model="productForm.productName" style="width: 20%"></el-input>
         </el-form-item>
-        <el-form-item label="缩略图" prop="smallProductImg">
-          <OssUploadImg :smallImg="productForm.smallProductImg" @submitSmallImg="submitSmallImg" ref="OssUploadImg"></OssUploadImg>
-          <!--          <el-input v-model="productForm.smallProductImg" style="width: 50%"></el-input>-->
+        <el-form-item label="缩略图" prop="smallProductImg" required>
+          <OssUploadImg :smallImg="productForm.smallProductImg" :idProductInfo="productForm.idProductInfo" @submitSmallImg="submitSmallImg" @updateSmallImg="updateSmallImg"
+                        ref="OssUploadImg"></OssUploadImg>
+          <el-input type="hidden" v-model="productForm.smallProductImg"></el-input>
         </el-form-item>
-        <el-form-item label="详情图" prop="bigProductImg">
-          <!--          <OssUploadImg :ossData="ossData"></OssUploadImg>-->
-          <!--          <el-input v-model="productForm.bigProductImg" style="width: 50%"></el-input>-->
-          <OssUploadBigImg :bigProductImg="productForm.bigProductImg" @submitBigImg="submitBigImg" ref="OssUploadBigImg"></OssUploadBigImg>
+        <el-form-item label="详情图" prop="bigProductImg" required>
+          <OssUploadBigImg :bigProductImg="productForm.bigProductImg" :idProductInfo="productForm.idProductInfo" @submitBigImg="submitBigImg" @updateBigImg="updateBigImg"
+                           ref="OssUploadBigImg"></OssUploadBigImg>
+          <el-input type="hidden" v-model="productForm.bigProductImg"></el-input>
         </el-form-item>
         <el-form-item label="所属商品ID" prop="idMallItem">
           <el-input v-model="productForm.idMallItem" @change="queryCoupon" style="width: 50%"></el-input>
@@ -80,7 +81,7 @@
                      active-color="#2B2B2CFF"></el-switch>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('productForm')">确定提交</el-button>
+          <el-button type="primary" @click="submitForm">确定提交</el-button>
           <el-button @click="retCouponTable">返回列表</el-button>
         </el-form-item>
       </el-form>
@@ -96,21 +97,18 @@ import {saveOrUpdateProduct} from "../api/productRequest";
 
 export default {
   name: "AddCoupon",
-  components: {OssUploadImg,OssUploadBigImg},
+  components: {OssUploadImg, OssUploadBigImg},
   data() {
     return {
-      productForm: {
-        smallProductImg: ''
-      },
+      productForm: {},
       rules: {
         productName: [{required: true, message: '请输入商品名称', trigger: 'blur'}, {
           whitespace: true,
           message: '名称不能仅含有空格',
           trigger: 'blur'
         }],
-        // productSmallImg: [{required: true, type: 'object', message: '请选择缩略图', trigger: 'blur'}],
-        // smallProductImg: [{required: true, message: '请选择缩略图', trigger: 'blur'}],
-        bigProductImg: [{required: true, message: '请选择详情图', trigger: 'blur'}],
+        smallProductImg: [{required: true, message: '请选择缩略图', trigger: 'blur'}],
+        bigProductImg: [{required: true, message: '请选详情略图', trigger: 'blur'}],
         idMallItem: [{required: true, message: '请输入商品ID', trigger: 'blur'}, {
           whitespace: true,
           message: 'ID不能仅含有空格',
@@ -133,29 +131,56 @@ export default {
     }
   },
   methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          console.log("smallProductImg1---->"+ this.productForm.smallProductImg)
-          console.log("BigProductImg1---->"+ this.productForm.BigProductImg)
-          saveOrUpdateProduct(this.productForm)
-          // this.$refs.OssUploadImg.submitUpload()
-          this.retCouponTable()
-        } else {
-          console.log('error submit!!');
-          return false;
-        }
-      });
+    async submitForm() {
+      await this.$refs.OssUploadImg.submitUpload()
+      await this.$refs.OssUploadImg.submitUpload()
+      await this.$refs['productForm'].validate((valid)=>{
+        this.$refs['productForm'].validate((valid) => {
+          if (valid) {
+            saveOrUpdateProduct(this.productForm).then(() => {
+              this.$message({
+                message: '新增商品成功',
+                type: 'success'
+              });
+              // this.retCouponTable()
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      })
     },
     submitSmallImg(path) {
       this.productForm.smallProductImg = path
-      console.log("smallProductImg2---->"+ this.productForm.smallProductImg)
+      console.log("smallProductImg2---->" + this.productForm.smallProductImg)
       // saveOrUpdateProduct(this.productForm)
+      // this.$refs['productForm'].validate((valid) => {
+      //   if (valid) {
+      //     saveOrUpdateProduct(this.productForm).then(() => {
+      //       this.$message({
+      //         message: '新增商品成功',
+      //         type: 'success'
+      //       });
+      //       this.retCouponTable()
+      //     })
+      //   } else {
+      //     console.log('error submit!!');
+      //     return false;
+      //   }
+      // });
+    },
+    updateSmallImg(path) {
+      this.productForm.smallProductImg = path
+    },
+    updateBigImg(path) {
+      this.productForm.bigProductImg = path
     },
     submitBigImg(path) {
-      this.productForm.BigProductImg = path
-      console.log("BigProductImg2---->"+ this.productForm.BigProductImg)
+      this.productForm.bigProductImg = path
+      console.log("BigProductImg2---->" + this.productForm.bigProductImg)
       // saveOrUpdateProduct(this.productForm)
+
     },
     retCouponTable() {
       this.$router.push('/couponTable')
