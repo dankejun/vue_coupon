@@ -12,15 +12,17 @@
         <el-form-item label="优惠券名称" prop="productName">
           <el-input v-model="productForm.productName" style="width: 20%"></el-input>
         </el-form-item>
-        <el-form-item label="缩略图" prop="smallProductImg" required>
-          <OssUploadImg :smallImg="productForm.smallProductImg" :idProductInfo="productForm.idProductInfo" @submitSmallImg="submitSmallImg" @updateSmallImg="updateSmallImg"
+        <el-form-item label="缩略图" prop="smallProductImg">
+          <OssUploadImg :smallImg="productForm.smallProductImg" :idProductInfo="productForm.idProductInfo"
+                        @submitSmallImg="submitSmallImg"
                         ref="OssUploadImg"></OssUploadImg>
-          <el-input type="hidden" v-model="productForm.smallProductImg"></el-input>
+          <input type="hidden" v-model="productForm.smallProductImg"></input>
         </el-form-item>
-        <el-form-item label="详情图" prop="bigProductImg" required>
-          <OssUploadBigImg :bigProductImg="productForm.bigProductImg" :idProductInfo="productForm.idProductInfo" @submitBigImg="submitBigImg" @updateBigImg="updateBigImg"
+        <el-form-item label="详情图" prop="bigProductImg">
+          <OssUploadBigImg :bigProductImg="productForm.bigProductImg" :idProductInfo="productForm.idProductInfo"
+                           @submitBigImg="submitBigImg"
                            ref="OssUploadBigImg"></OssUploadBigImg>
-          <el-input type="hidden" v-model="productForm.bigProductImg"></el-input>
+          <input type="hidden" v-model="productForm.bigProductImg"></input>
         </el-form-item>
         <el-form-item label="所属商品ID" prop="idMallItem">
           <el-input v-model="productForm.idMallItem" @change="queryCoupon" style="width: 50%"></el-input>
@@ -81,7 +83,7 @@
                      active-color="#2B2B2CFF"></el-switch>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm">确定提交</el-button>
+          <el-button type="primary" @click="submitForm('productForm')">确定提交</el-button>
           <el-button @click="retCouponTable">返回列表</el-button>
         </el-form-item>
       </el-form>
@@ -90,7 +92,7 @@
 </template>
 
 <script>
-import {queryCouponListByMId, queryProductDetailsById} from "../api/couponRequest";
+import {imgDeleteByPath, queryCouponListByMId, queryProductDetailsById} from "../api/couponRequest";
 import OssUploadImg from "./OssUploadImg";
 import OssUploadBigImg from "./OssUploadBigImg";
 import {saveOrUpdateProduct} from "../api/productRequest";
@@ -100,15 +102,25 @@ export default {
   components: {OssUploadImg, OssUploadBigImg},
   data() {
     return {
-      productForm: {},
+      productForm: {
+        idProductInfo: '',
+        productName: '',
+        smallProductImg: '',
+        bigProductImg: '',
+        idMallItem: '',
+        productPrice: '',
+        productOrder: '',
+        exchangeDescription: '',
+        productStatus: ''
+      },
       rules: {
         productName: [{required: true, message: '请输入商品名称', trigger: 'blur'}, {
           whitespace: true,
           message: '名称不能仅含有空格',
           trigger: 'blur'
         }],
-        smallProductImg: [{required: true, message: '请选择缩略图', trigger: 'blur'}],
-        bigProductImg: [{required: true, message: '请选详情略图', trigger: 'blur'}],
+        smallProductImg: [{required: true, message: '请上传缩略图到服务器', trigger: 'blur'}],
+        bigProductImg: [{required: true, message: '请上传详情图到服务器', trigger: 'blur'}],
         idMallItem: [{required: true, message: '请输入商品ID', trigger: 'blur'}, {
           whitespace: true,
           message: 'ID不能仅含有空格',
@@ -130,60 +142,54 @@ export default {
       });
     }
   },
+  beforeRouteLeave(to, from , next) {
+    if (!this.$route.path.startsWith('/add') && this.submitForm('productForm')) {
+      this.$confirm('确定退出商品编辑?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // this.retCouponTable();
+        next();
+      }).catch(() => {
+        next(false);
+      });
+    } else {
+      next(false)
+    }
+  },
   methods: {
-    async submitForm() {
-      await this.$refs.OssUploadImg.submitUpload()
-      await this.$refs.OssUploadImg.submitUpload()
-      await this.$refs['productForm'].validate((valid)=>{
-        this.$refs['productForm'].validate((valid) => {
-          if (valid) {
-            saveOrUpdateProduct(this.productForm).then(() => {
-              this.$message({
-                message: '新增商品成功',
-                type: 'success'
-              });
-              // this.retCouponTable()
-            })
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      })
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.saveOrUpdateProduct(this.productForm)
+          return true;
+        } else {
+          this.$message({
+            message: '商品必填字段不能为空',
+            type: 'warning'
+          });
+          return false;
+        }
+      });
+      return false;
     },
     submitSmallImg(path) {
       this.productForm.smallProductImg = path
-      console.log("smallProductImg2---->" + this.productForm.smallProductImg)
-      // saveOrUpdateProduct(this.productForm)
-      // this.$refs['productForm'].validate((valid) => {
-      //   if (valid) {
-      //     saveOrUpdateProduct(this.productForm).then(() => {
-      //       this.$message({
-      //         message: '新增商品成功',
-      //         type: 'success'
-      //       });
-      //       this.retCouponTable()
-      //     })
-      //   } else {
-      //     console.log('error submit!!');
-      //     return false;
-      //   }
-      // });
-    },
-    updateSmallImg(path) {
-      this.productForm.smallProductImg = path
-    },
-    updateBigImg(path) {
-      this.productForm.bigProductImg = path
     },
     submitBigImg(path) {
       this.productForm.bigProductImg = path
-      console.log("BigProductImg2---->" + this.productForm.bigProductImg)
-      // saveOrUpdateProduct(this.productForm)
-
     },
     retCouponTable() {
-      this.$router.push('/couponTable')
+      this.$confirm('确定退出商品编辑?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.submitForm('productForm')
+      }).catch(() => {
+        return false;
+      });
     },
     deleteRow(index, rows) {
       rows.splice(index, 1);
@@ -197,6 +203,24 @@ export default {
       queryCouponListByMId(this.productForm.idMallItem).then(response => {
         this.productForm.couponList = response.data.data;
         this.$forceUpdate()
+      })
+    },
+    saveOrUpdateProduct(productForm) {
+      saveOrUpdateProduct(productForm).then(response => {
+          if (response.data === true) {
+            this.$message({
+              message: '编辑商品信息成功',
+              type: 'success'
+            });
+            this.$router.push('/couponTable');
+          } else {
+            if (this.productForm.smallProductImg !== '') {
+              imgDeleteByPath(this.productForm.smallProductImg);
+            }
+            if (this.productForm.bigProductImg !== '') {
+              imgDeleteByPath(this.productForm.bigProductImg)
+            }
+          }
       })
     }
   }

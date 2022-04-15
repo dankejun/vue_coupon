@@ -13,10 +13,9 @@
       :auto-upload="false"
       :limit=1
       :on-exceed="handleExceed"
-      list-type="picture-card">
-      {{fileList}}
+      list-type="picture">
       <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-<!--      <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>-->
+      <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
       <div slot="tip" class="el-upload__tip">只能上传jpg/jpeg/png文件，且不超过5MB</div>
     </el-upload>
     <el-dialog :visible.sync="dialogVisible">
@@ -26,11 +25,12 @@
 </template>
 
 <script>
-import {getOssInfo, imgDelete, imgUpload} from "../api/couponRequest";
+import {getOssInfo, imgDelete, imgDeleteByPath, imgUpload} from "../api/couponRequest";
+import axios from "axios";
 
 export default {
   name: "OssUploadBigImg",
-  props: ['bigProductImg','idProductInfo'],
+  props: ['bigProductImg', 'idProductInfo'],
   data() {
     return {
       fileList: [],
@@ -40,43 +40,47 @@ export default {
       disabled: false
     }
   },
-  watch:{
-    bigProductImg:{
+  watch: {
+    bigProductImg: {
       handler(val) {
-        let arr = val.split('/')
-        let fileName = arr[arr.length - 1]
-        let file = {name:fileName,url:val}
-        this.fileList.push(file)
+        if (val !== null && val !== '') {
+          let arr = val.split('/');
+          let fileName = arr[arr.length - 1]
+          let file = {name: fileName, url: val}
+          this.fileList.push(file)
+        }
       }
     }
   },
   methods: {
     submitUpload() {
-      return new Promise((resolve)=>{
-        this.$refs.upload.submit();
-        resolve(this.path)
-      })
+      this.$refs.upload.submit();
     },
     handleRemove(file, fileList) {
-      let ImgDeleteRequest = {
-        idProductInfo: this.idProductInfo,
-        filePath: file.url,
-        isSmall: false
-      }
-      imgDelete(ImgDeleteRequest).then(response => {
-        if (response.data === true) {
-          this.$message({
-            showClose: true,
-            message: '删除成功',
-            type: 'success'
-          });
-          this.$emit('updateSmallImg','')
-          this.fileList = fileList;
+      if (this.fileList.length !== 0) {
+        let ImgDeleteRequest ={
+          idProductInfo: this.idProductInfo,
+          filePath: file.url,
+          isSmall: false
         }
-      });
-      },
+        imgDelete(ImgDeleteRequest).then(response => {
+          if (response.data === true) {
+            this.$message({
+              showClose: true,
+              message: '删除成功',
+              type: 'success'
+            });
+            this.$emit('submitBigImg', '')
+            // this.fileList = fileList;
+          }
+        });
+      }
+    },
     beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
+      if (file.type === 'image/jpg' || 'image/jpeg' || 'image/png') {
+        return this.$confirm(`确定移除缩略图？`);
+      }
+      return true;
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
@@ -90,7 +94,8 @@ export default {
       });
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/png' || 'image/jpg' || 'image/jpeg';
+      console.log(file.type)
+      const isJPG = file.type === 'image/jpg' || 'image/jpeg' || 'image/png';
       const isLt5M = file.size / 1024 / 1024 < 5;
 
       if (!isJPG) {
@@ -101,19 +106,14 @@ export default {
       }
       return isJPG && isLt5M;
     },
-    uploadImg({file}) {
+    uploadImg(param) {
       let form = new FormData()
-      form.append('file', file)
+      form.append('file', param.file)
       imgUpload(form).then(response => {
         this.path = response.data
-        this.$emit('submitBigImg',this.path)
-        console.log("u2 submitBigImg---->" + this.path)
+        this.$emit('submitBigImg', this.path)
       })
-      // this.path='big'
     }
-    // changeImg(file) {
-    //   this.$emit('submitSmallImg',file.url)
-    // }
   }
 }
 </script>

@@ -41,3 +41,12 @@ export function imgDelete (ImgDeleteRequest) {
     data: ImgDeleteRequest
   })
 }
+export function imgDeleteByPath (filePath) {
+  return Request({
+    url: '/v1/imgDeleteByPath',
+    method: 'post',
+    params:{
+      filePath: filePath
+    }
+  })
+}
