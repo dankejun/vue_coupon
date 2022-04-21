@@ -50,6 +50,18 @@
         </el-table-column>
         <el-table-column
           align="center"
+          prop="dateCreated"
+          sortable
+          label="创建时间">
+        </el-table-column>
+        <el-table-column
+          align="center"
+          prop="dateUpdated"
+          sortable
+          label="修改时间">
+        </el-table-column>
+        <el-table-column
+          align="center"
           prop="productStatus"
           label="上下架状态">
           <template slot-scope="scope">
@@ -61,15 +73,13 @@
       <!-- 分页组件 -->
       <el-pagination
         background
-        layout="prev, pager, next"
+        layout="total, prev, pager, next"
         :page-size=pageSize
         :pager-count="5"
         :total=total
         :page-count=pages
         :current-page.sync=pageIndex
-        @next-click="getPage(pageIndex + 1)"
-        @prev-click="getPage(pageIndex - 1)"
-        @current-change="getPage(pageIndex)"
+        @current-change="getPage"
         prev-text="上一页"
         next-text="下一页">
       </el-pagination>
@@ -83,28 +93,17 @@ import {queryProductInPage, updateProductStatus} from "../api/productRequest";
 export default {
   name: "CouponTable",
   data() {
-    let page;
-    let pageSize;
-    let pages;
-    let total;
     return {
       couponList: [],
       multipleSelection: [],
-      pageIndex: page,
-      pageSize: pageSize,
-      pages: pages,
-      total: total
+      pageIndex: 0,
+      pageSize: 0,
+      pages: 0,
+      total: 0
     };
   },
   mounted() {
-    queryProductInPage().then(response => {
-      let responseData = response.data.data
-      this.couponList = responseData.productList;
-      this.total = responseData.total;
-      this.pages = responseData.pages;
-      this.pageIndex = responseData.pageIndex;
-      this.pageSize = responseData.pageSize;
-    });
+    this.getPage()
   },
   methods: {
     handleSelectionChange(val) {
@@ -139,8 +138,8 @@ export default {
       if (userList.length !== 0) {
         updateProductStatus(userList).then(response => {
           if (response.data === true) {
-            // this.$refs.couponList.clearSelection()
-            location.reload()
+            this.$refs.couponList.clearSelection()
+            this.getPage(this.pageIndex);
           }
         });
       }

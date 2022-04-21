@@ -12,7 +12,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: {name: 'TaskTable'}
+      redirect: {path: 'TaskTable'}
     },
     {
       path: '/taskTable',

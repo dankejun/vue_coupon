@@ -31,6 +31,15 @@
         </el-table-column>
         <el-table-column
           align="center"
+          prop="taskStatus"
+          label="任务状态">
+          <template slot-scope="scope">
+　　　　　　　　　　<span v-if="scope.row.taskStatus===1">上架</span>
+　　　　　　　　　　<span v-if="scope.row.taskStatus===0">下架</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          align="center"
           prop="taskDescription"
           label="任务说明">
         </el-table-column>

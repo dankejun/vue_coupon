@@ -28,7 +28,7 @@
           <el-input v-model="productForm.idMallItem" @change="queryCoupon" style="width: 50%"></el-input>
         </el-form-item>
         <el-form-item label="商品原价" prop="productPrice">
-          <el-input v-model.number="productForm.productPrice" style="width: 10%"></el-input>
+          <el-input v-model="productForm.productPrice" style="width: 10%"></el-input>
           <span> 元</span>
         </el-form-item>
         <el-form-item label="优惠券面额设置" prop="couponList">
@@ -92,10 +92,10 @@
 </template>
 
 <script>
-import {imgDeleteByPath, queryCouponListByMId, queryProductDetailsById} from "../api/couponRequest";
+import {queryCouponListByMId} from "../api/couponRequest";
 import OssUploadImg from "./OssUploadImg";
 import OssUploadBigImg from "./OssUploadBigImg";
-import {saveOrUpdateProduct} from "../api/productRequest";
+import {imgDeleteByPath, queryProductDetailsById, saveOrUpdateProduct} from "../api/productRequest";
 
 export default {
   name: "AddCoupon",
@@ -109,7 +109,7 @@ export default {
         bigProductImg: '',
         idMallItem: '',
         productPrice: '',
-        productOrder: '',
+        productOrder: 0,
         exchangeDescription: '',
         productStatus: ''
       },
@@ -127,10 +127,7 @@ export default {
           trigger: 'blur'
         }],
         productPrice: [{required: true, message: '请输入商品原价', trigger: 'blur'}, {
-          type: 'number',
-          message: '请输入数字',
-          trigger: ['blur', 'change']
-        }]
+          pattern:/^[+-]?(0|([1-9]\d*))(\.\d+)?$/g,message: '商品价格必须是数字', trigger: 'blur'}]
       }
     };
   },
@@ -142,37 +139,26 @@ export default {
       });
     }
   },
-  beforeRouteLeave(to, from , next) {
-    if (!this.$route.path.startsWith('/add') && this.submitForm('productForm')) {
-      this.$confirm('确定退出商品编辑?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        // this.retCouponTable();
-        next();
-      }).catch(() => {
-        next(false);
-      });
-    } else {
-      next(false)
-    }
-  },
+  // beforeRouteLeave(to, from , next) {
+  //   if (!this.$route.path.startsWith('/add')) {
+  //     this.retCouponTable()
+  //     // next();
+  //   } else {
+  //     next();
+  //   }
+  // },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.saveOrUpdateProduct(this.productForm)
-          return true;
         } else {
           this.$message({
             message: '商品必填字段不能为空',
             type: 'warning'
           });
-          return false;
         }
       });
-      return false;
     },
     submitSmallImg(path) {
       this.productForm.smallProductImg = path
@@ -186,7 +172,17 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.submitForm('productForm')
+        if (this.$route.path.startsWith('/add')) {
+          if (this.productForm.smallProductImg !== '') {
+            imgDeleteByPath(this.productForm.smallProductImg);
+          }
+          if (this.productForm.bigProductImg !== '') {
+            imgDeleteByPath(this.productForm.bigProductImg)
+          }
+          this.$router.push('/couponTable');
+        } else {
+          this.$router.push('/couponTable');
+        }
       }).catch(() => {
         return false;
       });
@@ -195,8 +191,8 @@ export default {
       rows.splice(index, 1);
     },
     handleSort() {
-      if ((typeof this.productForm.sort) !== "number") {
-        this.productForm.sort = 0;
+      if ((typeof this.productForm.productOrder) !== "number" || this.productForm.productOrder === '') {
+        this.productForm.productOrder = 0;
       }
     },
     queryCoupon() {
@@ -207,12 +203,12 @@ export default {
     },
     saveOrUpdateProduct(productForm) {
       saveOrUpdateProduct(productForm).then(response => {
-          if (response.data === true) {
+        if (response.data === true) {
             this.$message({
               message: '编辑商品信息成功',
               type: 'success'
             });
-            this.$router.push('/couponTable');
+          this.$router.push('/couponTable');
           } else {
             if (this.productForm.smallProductImg !== '') {
               imgDeleteByPath(this.productForm.smallProductImg);

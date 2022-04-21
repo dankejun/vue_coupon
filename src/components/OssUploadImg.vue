@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import {imgDelete, imgDeleteByPath, imgUpload} from "../api/couponRequest";
-import axios from "axios";
+
+import {imgDelete, imgUpload} from "../api/productRequest";
 
 export default {
   name: "OssUploadImg",

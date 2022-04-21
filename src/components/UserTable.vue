@@ -7,19 +7,24 @@
           <el-input style="width: 200px" v-model="searchRequest.idUserInfo" placeholder="用户ID"></el-input>
         </el-form-item>
 
-        <el-form-item label="用户昵称">
-          <el-input style="width: 200px" v-model="searchRequest.userName" placeholder="用户昵称"></el-input>
+        <el-form-item label="用户手机号">
+          <el-input style="width: 200px" v-model="searchRequest.mobile" placeholder="用户手机号"></el-input>
         </el-form-item>
 
         <el-form-item label="是否兑换耗材">
           <el-select style="width: 100px" v-model="searchRequest.exchangedFlag" placeholder="是否兑换耗材">
             <el-option label="是" value=1></el-option>
             <el-option label="否" value=0></el-option>
+            <el-option label="全部" value=null></el-option>
           </el-select>
         </el-form-item>
 
-        <el-form-item label="上次兑换商品名称">
-          <el-input disabled style="width: 200px" v-model="searchRequest.lastExchangeName" placeholder="上次兑换商品名称"></el-input>
+        <el-form-item label="用户状态">
+          <el-select style="width: 100px" v-model="searchRequest.status" placeholder="用户状态">
+            <el-option label="正常" value=1></el-option>
+            <el-option label="限制" value=0></el-option>
+            <el-option label="全部" value=null></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="登陆时间">
           <div class="block">
@@ -35,7 +40,7 @@
         <br>
         <div style="text-align: center">
           <el-form-item>
-            <el-button type="primary" @click="searchUserList">查询</el-button>
+            <el-button type="primary" @click="getUserListPage()">查询</el-button>
             <el-button @click="resetList">重置</el-button>
           </el-form-item>
         </div>
@@ -70,6 +75,11 @@
           align="center"
           prop="userName"
           label="用户名称">
+        </el-table-column>
+        <el-table-column
+          align="center"
+          prop="mobile"
+          label="用户手机号">
         </el-table-column>
         <el-table-column
           align="center"
@@ -141,20 +151,18 @@
       <!-- 分页组件 -->
       <el-pagination
         background
-        layout="prev, pager, next"
+        layout="total, prev, pager, next"
         :page-size=userListPage.pageSize
         :pager-count="5"
         :total=userListPage.total
         :page-count=userListPage.pages
-        :current-page.sync=userListPage.pageIndex
-        @current-change="getUserListPage(userListPage.pageIndex)"
-        @next-click="getUserListPage(userListPage.pageIndex + 1)"
-        @prev-click="getUserListPage(userListPage.pageIndex - 1)"
+        :current-page=userListPage.pageIndex
+        @current-change="getUserListPage"
         prev-text="上一页"
         next-text="下一页">
       </el-pagination>
     </el-main>
-      <!--用户详情-->
+    <!--用户详情-->
     <el-drawer
       title="用户详情"
       :visible.sync="drawer"
@@ -163,10 +171,10 @@
       :withHeader=false>
       <el-descriptions class="margin-top" title="用户详情" :column="2" direction="horizontal">
         <el-descriptions-item label="用户昵称" :span="1">{{ userDetails.userName }}</el-descriptions-item>
-        <el-descriptions-item label="用户状态" :span="2">{{ userDetails.status === 1 ? '正常' : '限制' }}</el-descriptions-item>
-        <el-descriptions-item label="用户ID" :span="2">{{ userDetails.idUserInfo }}</el-descriptions-item>
+        <el-descriptions-item label="用户状态" :span="1">{{ userDetails.status === 1 ? '正常' : '限制' }}</el-descriptions-item>
+        <el-descriptions-item label="用户ID" :span="1">{{ userDetails.idUserInfo }}</el-descriptions-item>
         <el-descriptions-item label="拥有水滴" :span="1">{{ userDetails.dripCount }}</el-descriptions-item>
-        <el-descriptions-item label="今日获取水滴" :span="2">{{ userDetails.todayDripCount }}</el-descriptions-item>
+        <!--        <el-descriptions-item label="今日获取水滴" :span="2">{{ userDetails.todayDripCount }}</el-descriptions-item>-->
         <el-descriptions-item label="最近登陆时间" :span="1">{{ userDetails.lastVisitTime }}</el-descriptions-item>
       </el-descriptions>
       <el-table
@@ -194,28 +202,25 @@
       </el-table>
       <!-- 分页组件 -->
       <el-pagination
-          background
-          layout="prev, pager, next"
-          :page-size=userDetailsPage.pageSize
-          :pager-count="5"
-          :total=userDetailsPage.total
-          :page-count=userDetailsPage.pages
-          :current-page.sync=userDetailsPage.pageIndex
-          @current-change="getUserDetailsPage(userDetailsPage.pageIndex)"
-          @next-click="getUserDetailsPage(userDetailsPage.pageIndex + 1)"
-          @prev-click="getUserDetailsPage(userDetailsPage.pageIndex - 1)"
-          prev-text="上一页"
-          next-text="下一页">
-        </el-pagination>
+        background
+        layout="total, prev, pager, next"
+        :page-size=userDetailsPage.pageSize
+        :pager-count="5"
+        :total=userDetailsPage.total
+        :page-count=userDetailsPage.pages
+        :current-page.sync=userDetailsPage.pageIndex
+        @current-change="getUserDetailsPage"
+        prev-text="上一页"
+        next-text="下一页">
+      </el-pagination>
     </el-drawer>
   </el-container>
 </template>
 
 <script>
 import {
-  queryUserDetailsById, queryUserDetailsInPage,
+  queryUserDetailsInPage,
   queryUserInPage,
-  searchUserList,
   updateUserStatus
 } from "../api/userRequest";
 
@@ -259,10 +264,6 @@ export default {
     resetList() {
       this.searchRequest = {}
     },
-    queryUserInfoById(row) {
-      this.drawer = true;
-      queryUserDetailsById(row.idUserInfo).then(response => (this.userDetails = response.data.data))
-    },
     queryUserInfoByIdInPage(row) {
       this.drawer = true;
       this.userDetails.idUserInfo = row.idUserInfo
@@ -279,20 +280,15 @@ export default {
       if (userList.length !== 0) {
         updateUserStatus(userList).then(response => {
           if (response.data === true) {
-            location.reload()
+            this.$refs.userList.clearSelection();
+            this.resetList()
+            this.getUserListPage(this.userListPage.pageIndex);
           }
         });
       }
     },
-    searchUserList() {
-      if (this.searchRequest != null) {
-        searchUserList(this.searchRequest).then(response =>{
-          this.userList = response.data.data;
-        });
-      }
-    },
-    getUserListPage(pageIndex) {
-      queryUserInPage(pageIndex).then(response => {
+    getUserListPage(pageIndex, pageSize) {
+      queryUserInPage(this.searchRequest, pageIndex, pageSize).then(response => {
         let responseData = response.data.data
         this.userList = responseData.userList;
         this.userListPage.total = responseData.total;
@@ -301,6 +297,7 @@ export default {
         this.userListPage.pageSize = responseData.pageSize;
       });
     },
+
     getUserDetailsPage(pageIndex) {
       queryUserDetailsInPage(this.userDetails.idUserInfo, pageIndex).then(response => {
         let responseData = response.data.data

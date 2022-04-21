@@ -1,11 +1,5 @@
 import Request from "../utils/request";
 
-export function getProductList () {
-  return Request({
-    url: '/v1/queryProduct',
-    method: 'post'
-  })
-}
 export function updateProductStatus(productList) {
   return Request({
     url: '/v1/updateProductStatus',
@@ -35,5 +29,40 @@ export function saveOrUpdateProduct(productAddRequest) {
       'Content-Type': 'application/json'
     },
     data: productAddRequest
+  })
+}
+export function queryProductDetailsById (idProductInfo) {
+  return Request({
+    url: '/v1/queryProductDetailsById',
+    method: 'post',
+    params:{
+      idProductInfo: idProductInfo
+    }
+  })
+}
+export function imgUpload (file) {
+  return Request({
+    url: '/v1/imgUpload',
+    method: 'post',
+    data: file
+  })
+}
+export function imgDelete (ImgDeleteRequest) {
+  return Request({
+    url: '/v1/imgDelete',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: ImgDeleteRequest
+  })
+}
+export function imgDeleteByPath (filePath) {
+  return Request({
+    url: '/v1/imgDeleteByPath',
+    method: 'post',
+    params:{
+      filePath: filePath
+    }
   })
 }

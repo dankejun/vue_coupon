@@ -59,9 +59,7 @@ export default {
     }
   },
   mounted() {
-    getActivityList().then(response => {
-      this.activityList = response.data.data;
-    });
+    this.queryActivityList()
   },
   methods: {
     handleSelectionChange(val) {
@@ -70,14 +68,18 @@ export default {
     updateStatus(status) {
       for (let selection of this.multipleSelection) {
         if (selection.activityStatus !== status) {
-          selection.activityStatus = status
           let id = selection.idActivityInfo;
           updateActivityStatus(id, status).then(response => {
-            // this.$refs.activityList.clearSelection();
-            location.reload()
+            this.$refs.activityList.clearSelection();
+            this.queryActivityList()
           });
         }
       }
+    },
+    queryActivityList() {
+      getActivityList().then(response => {
+        this.activityList = response.data.data;
+      });
     }
   }
 }

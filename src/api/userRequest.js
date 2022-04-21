@@ -1,20 +1,5 @@
 import Request from "../utils/request";
 
-export function getUserList () {
-  return Request({
-    url: '/v1/queryUserList',
-    method: 'post'
-  })
-}
-export function queryUserDetailsById(idActivityInfo) {
-  return Request({
-    url: '/v1/queryUserDetailsById',
-    method: 'post',
-    params: {
-      idUserInfo: idActivityInfo
-    }
-  })
-}
 export function updateUserStatus(userList) {
   return Request({
     url: '/v1/updateUserStatus',
@@ -25,25 +10,19 @@ export function updateUserStatus(userList) {
     data:userList
   })
 }
-export function searchUserList(searchRequest) {
-  return Request({
-    url: '/v1/searchUserList',
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    data:searchRequest
-  })
-}
 
-export function queryUserInPage(pageIndex, pageSize) {
+export function queryUserInPage(searchRequest, pageIndex, pageSize) {
   return Request({
     url: '/v1/queryUserInPage',
     method: 'post',
     params: {
       pageIndex: pageIndex,
       pageSize: pageSize
-    }
+    },
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: searchRequest
   })
 }
 
