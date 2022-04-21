@@ -10,7 +10,7 @@
       <el-form size="small" :model="productForm" :rules="rules" ref="productForm" label-width="130px"
                class="demo-ruleForm">
         <el-form-item label="优惠券名称" prop="productName">
-          <el-input v-model="productForm.productName" style="width: 20%"></el-input>
+          <el-input v-model="productForm.productName" style="width: 25%"></el-input>
         </el-form-item>
         <el-form-item label="缩略图" prop="smallProductImg">
           <OssUploadImg :smallImg="productForm.smallProductImg" :idProductInfo="productForm.idProductInfo"
@@ -109,7 +109,7 @@ export default {
         bigProductImg: '',
         idMallItem: '',
         productPrice: '',
-        productOrder: 0,
+        productOrder: '',
         exchangeDescription: '',
         productStatus: ''
       },
@@ -118,7 +118,7 @@ export default {
           whitespace: true,
           message: '名称不能仅含有空格',
           trigger: 'blur'
-        }],
+        },{max: 20, message: '商品名称最多不超过20字', trigger: 'blur' }],
         smallProductImg: [{required: true, message: '请上传缩略图到服务器', trigger: 'blur'}],
         bigProductImg: [{required: true, message: '请上传详情图到服务器', trigger: 'blur'}],
         idMallItem: [{required: true, message: '请输入商品ID', trigger: 'blur'}, {
@@ -127,7 +127,7 @@ export default {
           trigger: 'blur'
         }],
         productPrice: [{required: true, message: '请输入商品原价', trigger: 'blur'}, {
-          pattern:/^[+-]?(0|([1-9]\d*))(\.\d+)?$/g,message: '商品价格必须是数字', trigger: 'blur'}]
+          pattern:/^(0|([1-9]\d*))(\.\d+)?$/g,message: '商品价格必须是数字', trigger: 'blur'}]
       }
     };
   },
