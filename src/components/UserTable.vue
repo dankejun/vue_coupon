@@ -2,13 +2,13 @@
   <el-container>
     <!--头部搜索-->
     <el-header>
-      <el-form size="small" :inline="true" :model="searchRequest" style="text-align: center" class="demo-form-inline">
+      <el-form size="small" :inline="true" :model="searchRequest" style="text-align: left" class="demo-form-inline">
         <el-form-item label="用户ID">
           <el-input style="width: 200px" v-model="searchRequest.idUserInfo" placeholder="用户ID"></el-input>
         </el-form-item>
 
         <el-form-item label="用户手机号">
-          <el-input style="width: 200px" v-model="searchRequest.mobile" placeholder="用户手机号"></el-input>
+          <el-input style="width: 200px" v-model.trim="searchRequest.mobile" placeholder="用户手机号"></el-input>
         </el-form-item>
 
         <el-form-item label="是否兑换耗材">
@@ -26,7 +26,7 @@
             <el-option label="全部" value=null></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="登陆时间">
+        <el-form-item label="登录时间">
           <div class="block">
             <el-date-picker
               v-model="searchRequest.lastVisitTime"
@@ -76,11 +76,11 @@
           prop="userName"
           label="用户名称">
         </el-table-column>
-        <el-table-column
-          align="center"
-          prop="mobile"
-          label="用户手机号">
-        </el-table-column>
+<!--        <el-table-column-->
+<!--          align="center"-->
+<!--          prop="mobile"-->
+<!--          label="用户手机号">-->
+<!--        </el-table-column>-->
         <el-table-column
           align="center"
           prop="idUserInfo"
@@ -137,7 +137,7 @@
         <el-table-column
           align="center"
           prop="lastVisitTime"
-          label="最近登陆时间">
+          label="最近登录时间">
         </el-table-column>
         <el-table-column
           align="center"
@@ -167,15 +167,15 @@
       title="用户详情"
       :visible.sync="drawer"
       direction="ltr"
-      size="45%"
-      :withHeader=false>
-      <el-descriptions class="margin-top" title="用户详情" :column="2" direction="horizontal">
+      size="45%">
+      <el-descriptions class="margin-top" :column="2" direction="horizontal">
         <el-descriptions-item label="用户昵称" :span="1">{{ userDetails.userName }}</el-descriptions-item>
         <el-descriptions-item label="用户状态" :span="1">{{ userDetails.status === 1 ? '正常' : '限制' }}</el-descriptions-item>
         <el-descriptions-item label="用户ID" :span="1">{{ userDetails.idUserInfo }}</el-descriptions-item>
+        <el-descriptions-item label="用户手机" :span="1">{{ userDetails.mobile }}</el-descriptions-item>
         <el-descriptions-item label="拥有水滴" :span="1">{{ userDetails.dripCount }}</el-descriptions-item>
         <!--        <el-descriptions-item label="今日获取水滴" :span="2">{{ userDetails.todayDripCount }}</el-descriptions-item>-->
-        <el-descriptions-item label="最近登陆时间" :span="1">{{ userDetails.lastVisitTime }}</el-descriptions-item>
+        <el-descriptions-item label="最近登录时间" :span="1">{{ userDetails.lastVisitTime }}</el-descriptions-item>
       </el-descriptions>
       <el-table
         :data="userDetails.exchangeList"

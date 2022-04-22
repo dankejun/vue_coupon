@@ -89,6 +89,7 @@
 
 <script>
 import {queryProductInPage, updateProductStatus} from "../api/productRequest";
+import {queryCouponListByMId} from "../api/couponRequest";
 
 export default {
   name: "CouponTable",
@@ -128,15 +129,31 @@ export default {
       }
     },
     updateStatus(status) {
-      let userList = [];
+      let productList = [];
       for (let selection of this.multipleSelection) {
         if (selection.productStatus !== status) {
-          selection.productStatus = status;
-          userList.push(selection);
+          if (status === 1) {
+            queryCouponListByMId(selection.idMallItem).then(response => {
+              if (response.data.data.length !== 0) {
+                console.log("productStatus")
+                selection.productStatus = status;
+                productList.push(selection);
+              } else {
+                  this.$notify({
+                    title: '警告',
+                    message: `${selection.productName}未关联优惠券，请关联后再试`,
+                    type: 'warning'
+                  });
+              }
+            });
+          } else {
+            selection.productStatus = status;
+            productList.push(selection);
+          }
         }
       }
-      if (userList.length !== 0) {
-        updateProductStatus(userList).then(response => {
+      if (productList.length !== 0) {
+        updateProductStatus(productList).then(response => {
           if (response.data === true) {
             this.$refs.couponList.clearSelection()
             this.getPage(this.pageIndex);
