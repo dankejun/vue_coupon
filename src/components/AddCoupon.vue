@@ -26,6 +26,7 @@
         </el-form-item>
         <el-form-item label="所属商品ID" prop="idMallItem">
           <el-input v-model="productForm.idMallItem" @change="queryCoupon" style="width: 50%"></el-input>
+          <span style="margin-left: 30px;color: darkgray">商城商品唯一标识</span>
         </el-form-item>
         <el-form-item label="商品原价" prop="productPrice">
           <el-input v-model="productForm.productPrice" style="width: 10%"></el-input>
@@ -92,7 +93,7 @@
 </template>
 
 <script>
-import {queryCouponListByMId} from "../api/couponRequest";
+import {hasProduct, queryCouponListByMId} from "../api/couponRequest";
 import OssUploadImg from "./OssUploadImg";
 import OssUploadBigImg from "./OssUploadBigImg";
 import {imgDeleteByPath, queryProductDetailsById, saveOrUpdateProduct} from "../api/productRequest";
@@ -101,7 +102,23 @@ export default {
   name: "AddCoupon",
   components: {OssUploadImg, OssUploadBigImg},
   data() {
+    let validateMallId = (rule, value, callback) => {
+      hasProduct(value).then(response => {
+        console.log(this.$route.path)
+        if (this.$route.path.startsWith('/add') && response.data > 0) {
+          console.log("1");
+          callback(new Error('所属商品ID已存在'));
+        } else if (this.$route.path.startsWith('/update') && this.productForm.idMallItem !== this.beforeIdMallItem && response.data > 0) {
+          console.log("2");
+          callback(new Error('所属商品ID已存在'));
+        } else {
+          console.log("3");
+          callback();
+        }
+      });
+    };
     return {
+      beforeIdMallItem: '',
       productForm: {
         idProductInfo: '',
         productName: '',
@@ -118,16 +135,17 @@ export default {
           whitespace: true,
           message: '名称不能仅含有空格',
           trigger: 'blur'
-        },{max: 20, message: '商品名称最多不超过20字', trigger: 'blur' }],
+        }, {max: 20, message: '商品名称最多不超过20字', trigger: 'blur'}],
         smallProductImg: [{required: true, message: '请上传缩略图到服务器', trigger: 'blur'}],
         bigProductImg: [{required: true, message: '请上传详情图到服务器', trigger: 'blur'}],
         idMallItem: [{required: true, message: '请输入商品ID', trigger: 'blur'}, {
           whitespace: true,
           message: 'ID不能仅含有空格',
           trigger: 'blur'
-        }],
+        },{ validator: validateMallId, trigger: 'blur' }],
         productPrice: [{required: true, message: '请输入商品原价', trigger: 'blur'}, {
-          pattern:/^(0|([1-9]\d*))(\.\d+)?$/g,message: '商品价格必须是数字', trigger: 'blur'}]
+          pattern: /^(0|([1-9]\d*))(\.\d+)?$/g, message: '商品价格必须是数字', trigger: 'blur'
+        }]
       }
     };
   },
@@ -135,10 +153,12 @@ export default {
     if (this.$route.params.id != null) {
       queryProductDetailsById(this.$route.params.id).then(response => {
         this.productForm = response.data.data
+        this.beforeIdMallItem = this.productForm.idMallItem
         this.queryCoupon()
       });
     }
   },
+  // var hasProduct =
   // beforeRouteLeave(to, from , next) {
   //   if (!this.$route.path.startsWith('/add')) {
   //     this.retCouponTable()
@@ -204,21 +224,22 @@ export default {
     saveOrUpdateProduct(productForm) {
       saveOrUpdateProduct(productForm).then(response => {
         if (response.data === true) {
-            this.$message({
-              message: '编辑商品信息成功',
-              type: 'success'
-            });
+          this.$message({
+            message: '编辑商品信息成功',
+            type: 'success'
+          });
           this.$router.push('/couponTable');
-          } else {
-            if (this.productForm.smallProductImg !== '') {
-              imgDeleteByPath(this.productForm.smallProductImg);
-            }
-            if (this.productForm.bigProductImg !== '') {
-              imgDeleteByPath(this.productForm.bigProductImg)
-            }
+        } else {
+          this.$message.error('保存商品失败！');
+          if (this.productForm.smallProductImg !== '') {
+            imgDeleteByPath(this.productForm.smallProductImg);
           }
+          if (this.productForm.bigProductImg !== '') {
+            imgDeleteByPath(this.productForm.bigProductImg)
+          }
+        }
       })
-    }
+    },
   }
 };
 </script>

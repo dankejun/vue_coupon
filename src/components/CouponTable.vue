@@ -128,14 +128,13 @@ export default {
         }
       }
     },
-    updateStatus(status) {
+    async updateStatus(status) {
       let productList = [];
       for (let selection of this.multipleSelection) {
         if (selection.productStatus !== status) {
           if (status === 1) {
-            queryCouponListByMId(selection.idMallItem).then(response => {
+           await queryCouponListByMId(selection.idMallItem).then(response => {
               if (response.data.data.length !== 0) {
-                console.log("productStatus")
                 selection.productStatus = status;
                 productList.push(selection);
               } else {
@@ -152,11 +151,20 @@ export default {
           }
         }
       }
+      console.log(productList.length)
       if (productList.length !== 0) {
         updateProductStatus(productList).then(response => {
           if (response.data === true) {
-            this.$refs.couponList.clearSelection()
+            this.$message.success("修改成功")
+            this.$refs.couponList.clearSelection();
             this.getPage(this.pageIndex);
+          } else {
+            this.$refs.couponList.clearSelection();
+            this.getPage(this.pageIndex);
+            this.$message({
+              message: '修改失败，请重试',
+              type: 'warning'
+            });
           }
         });
       }

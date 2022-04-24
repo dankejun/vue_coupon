@@ -9,3 +9,12 @@ export function queryCouponListByMId (idMallItem) {
     }
   })
 }
+export function hasProduct (idMallItem) {
+  return Request({
+    url: '/v1/hasProduct',
+    method: 'post',
+    params:{
+      idMallItem: idMallItem
+    }
+  })
+}

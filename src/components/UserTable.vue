@@ -277,11 +277,13 @@ export default {
           userList.push(selection);
         }
       }
+      console.log(userList.length)
       if (userList.length !== 0) {
         updateUserStatus(userList).then(response => {
           if (response.data === true) {
+            this.$message.success("修改成功")
             this.$refs.userList.clearSelection();
-            this.resetList()
+            // this.resetList()
             this.getUserListPage(this.userListPage.pageIndex);
           }
         });
