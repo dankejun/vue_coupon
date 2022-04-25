@@ -17,6 +17,7 @@
       <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
       <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
       <div slot="tip" class="el-upload__tip">只能上传jpg/jpeg/png文件，且不超过5MB</div>
+      {{this.fileList}}
     </el-upload>
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="">
@@ -58,7 +59,7 @@ export default {
     },
     handleRemove(file, fileList) {
       if (this.fileList.length !== 0) {
-        let ImgDeleteRequest ={
+        let ImgDeleteRequest = {
           idProductInfo: this.idProductInfo,
           filePath: file.url,
           isSmall: false
@@ -71,7 +72,14 @@ export default {
               type: 'success'
             });
             this.$emit('submitBigImg', '')
-            // this.fileList = fileList;
+            this.fileList = fileList;
+          } else {
+            this.$message({
+              showClose: true,
+              message: '删除失败，请重试',
+              type: 'error'
+            });
+            this.fileList = fileList;
           }
         });
       }
