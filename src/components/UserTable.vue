@@ -11,32 +11,32 @@
           <el-input style="width: 200px" v-model.trim="searchRequest.mobile" placeholder="用户手机号"></el-input>
         </el-form-item>
 
-        <el-form-item label="是否兑换耗材">
-          <el-select style="width: 100px" v-model="searchRequest.exchangedFlag" placeholder="是否兑换耗材">
-            <el-option label="是" value=1></el-option>
-            <el-option label="否" value=0></el-option>
-            <el-option label="全部" value=null></el-option>
-          </el-select>
-        </el-form-item>
+<!--        <el-form-item label="是否兑换耗材">-->
+<!--          <el-select style="width: 100px" v-model="searchRequest.exchangedFlag" placeholder="是否兑换耗材">-->
+<!--            <el-option label="是" value=1></el-option>-->
+<!--            <el-option label="否" value=0></el-option>-->
+<!--            <el-option label="全部" value=null></el-option>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
 
-        <el-form-item label="用户状态">
-          <el-select style="width: 100px" v-model="searchRequest.status" placeholder="用户状态">
-            <el-option label="正常" value=1></el-option>
-            <el-option label="限制" value=0></el-option>
-            <el-option label="全部" value=null></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="登录时间">
-          <div class="block">
-            <el-date-picker
-              v-model="searchRequest.lastVisitTime"
-              type="date"
-              placeholder="选择日期"
-              value-format="yyyy-MM-dd"
-              style="width: 200px">
-            </el-date-picker>
-          </div>
-        </el-form-item>
+<!--        <el-form-item label="用户状态">-->
+<!--          <el-select style="width: 100px" v-model="searchRequest.status" placeholder="用户状态">-->
+<!--            <el-option label="正常" value=1></el-option>-->
+<!--            <el-option label="限制" value=0></el-option>-->
+<!--            <el-option label="全部" value=null></el-option>-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
+<!--        <el-form-item label="登录时间">-->
+<!--          <div class="block">-->
+<!--            <el-date-picker-->
+<!--              v-model="searchRequest.lastVisitTime"-->
+<!--              type="date"-->
+<!--              placeholder="选择日期"-->
+<!--              value-format="yyyy-MM-dd"-->
+<!--              style="width: 200px">-->
+<!--            </el-date-picker>-->
+<!--          </div>-->
+<!--        </el-form-item>-->
         <br>
         <div style="text-align: center">
           <el-form-item>

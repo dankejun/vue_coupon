@@ -134,14 +134,15 @@ export default {
         if (selection.productStatus !== status) {
           if (status === 1) {
            await queryCouponListByMId(selection.idMallItem).then(response => {
-              if (response.data.data.length !== 0) {
+              if (response.data.data.length !== 0 && selection.smallProductImg !== '' && selection.bigProductImg !== '') {
                 selection.productStatus = status;
                 productList.push(selection);
               } else {
                   this.$notify({
                     title: '警告',
-                    message: `${selection.productName}未关联优惠券，请关联后再试`,
-                    type: 'warning'
+                    message: `商品【${selection.productName}】未关联优惠券或未上传图片，请完善商品信息后再试`,
+                    type: 'warning',
+                    duration: 2000
                   });
               }
             });
